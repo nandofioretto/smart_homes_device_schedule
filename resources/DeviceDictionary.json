@@ -1,0 +1,259 @@
+{
+  "devices": {
+
+    "LG_LW1212ER" : {
+      "type": "actuator",
+      "subtype": "cooler",
+      "location": "room",
+      "actions": {
+        "off": {
+          "power_consumed": 0.0,
+          "effects": [{"property": "temperature_cool", "delta": 3.55}]
+        },
+        "fan": {
+          "power_consumed": 0.5,
+          "effects": [{"property": "temperature_cool", "delta": 0.66}]
+        },
+        "heat": {
+          "power_consumed": 2.3,
+          "effects": [{"property": "temperature_cool", "delta": -10.2}]
+        }
+      }
+    },
+
+    "Bryant_697CN030B" : {
+      "type": "actuator",
+      "subtype": "heater",
+      "location": "room",
+      "actions": {
+        "off": {
+          "power_consumed": 0.0,
+          "effects": [{"property": "temperature_heat", "delta": -4.67}]
+        },
+        "fan": {
+          "power_consumed": 0.5,
+          "effects": [{"property": "temperature_heat", "delta": -0.44}]
+        },
+        "heat": {
+          "power_consumed": 2.3,
+          "effects": [{"property": "temperature_heat", "delta": 8.2}]
+        }
+      }
+    },
+
+    "LG_WM2016CW" : {
+      "type": "actuator",
+      "subtype": "cloths_washer",
+      "location": "room",
+      "actions": {
+        "off": {
+          "power_consumed": 0.0,
+          "effects": [{"property": "laundry_wash", "delta": 0.0}]
+        },
+        "reg_cycle": {
+          "power_consumed": 5.76,
+          "effects": [{"property": "laundry_wash", "delta": 1.0}]
+        }
+      }
+    },
+
+    "LG_WM2016CW_sensor": {
+      "type": "sensor",
+      "current_state": 0,
+      "subtype": "cloths_washer",
+      "location": "LG_WM2016CW",
+      "sensing_properties": ["laundry_wash"]
+    },
+
+    "GE_WSM2420D3WW" : {
+      "type": "actuator",
+      "subtype": "cloths_dryer",
+      "location": "room",
+      "actions": {
+        "off": {
+          "power_consumed": 0.0,
+          "effects": [{"property": "laundry_dry", "delta": 0.0}]
+        },
+        "reg_cycle": {
+          "power_consumed": 5.76,
+          "effects": [{"property": "laundry_dry", "delta": 1.0}]
+        }
+      }
+    },
+
+    "GE_WSM2420D3WW_sensor": {
+      "type": "sensor",
+      "current_state": 0,
+      "subtype": "cloths_dryer",
+      "location": "GE_WSM2420D3WW",
+      "sensing_properties": ["laundry_dry"]
+    },
+
+    "Kenmore_665.13242K900" : {
+      "type": "actuator",
+      "subtype": "dishwasher",
+      "current_state": 0,
+      "location": "room",
+      "actions": {
+        "off": {
+          "power_consumed": 0.0,
+          "effects": [{"property": "dish_wash", "delta": 0.0}]
+        },
+        "reg_cycle": {
+          "power_consumed": 4.6,
+          "effects": [{"property": "dish_wash", "delta": 1.0}]
+        }
+      }
+    },
+
+    "Kenmore_665_sensor": {
+      "type": "sensor",
+      "subtype": "dishwasher",
+      "current_state": 0,
+      "location": "Kenmore_665.13242K900",
+      "sensing_properties": ["dish_wash"]
+    },
+
+    "E52-50R-045DV" : {
+      "type": "actuator",
+      "subtype": "water_heater",
+      "location": "water_tank",
+      "actions": {
+        "off": {
+          "power_consumed": 0.0,
+          "effects": [{"property": "water_temp", "delta": -2.22}]
+        },
+        "heat": {
+          "power_consumed": 4.6,
+          "effects": [{"property": "water_temp", "delta": 11.1}]
+        }
+      }
+    },
+
+    "water_heat_sensor": {
+      "type": "sensor",
+      "subtype": "water_heater",
+      "current_state": 22,
+      "location": "water_tank",
+      "sensing_properties": ["water_temp"]
+    },
+
+    "Kenmore_790.91312013" : {
+      "type": "actuator",
+      "subtype": "oven",
+      "location": "room",
+      "actions": {
+        "off": {
+          "power_consumed": 0.0,
+          "effects": [
+            {"property": "bake", "delta": 0.0},
+            {"property": "temperature_heat", "delta": -0.0},
+            {"property": "temperature_cool", "delta": -0.0}
+          ]
+        },
+        "bake": {
+          "power_consumed": 8.46,
+          "effects": [
+            {"property": "bake", "delta": 1.0},
+            {"property": "temperature_heat", "delta": 2.01},
+            {"property": "temperature_cool", "delta": 2.01}
+          ]
+        },
+        "broil": {
+          "power_consumed": 10.56,
+          "effects": [
+            {"property": "bake", "delta": 1.5},
+            {"property": "temperature_heat", "delta": 2.44},
+            {"property": "temperature_cool", "delta": 2.44}
+          ]
+        }
+      }
+    },
+
+    "Kenmore_sensor": {
+      "type": "sensor",
+      "subtype": "oven",
+      "current_state": 0,
+      "location": "Kenmore_790.91312013",
+      "sensing_properties": ["bake"]
+    },
+
+    "iRobot_651": {
+      "type": "actuator",
+      "subtype": "vacuum_cleaner",
+      "location": "room",
+      "actions": {
+          "off": {
+            "power_consumed": 0.0,
+            "effects": [{"property": "cleanliness", "delta": 0.0},  {"property": "charge", "delta": 0.0}]
+          },
+        "vacuum": {
+          "power_consumed": 0.0,
+          "effects": [{"property": "cleanliness", "delta": 33.3},  {"property": "charge", "delta": -25.0}]
+        },
+        "charge": {
+          "power_consumed": 0.26,
+          "effects": [{"property": "charge", "delta": 40.0}]
+        }
+      }
+    },
+
+    "iRobot_651_battery": {
+      "type": "sensor",
+      "subtype": "battery",
+      "current_state": 0,
+      "location": "iRobot_651",
+      "sensing_properties": ["charge"]
+    },
+
+    "Tesla_S" : {
+      "type": "actuator",
+      "subtype": "electric_vehicle",
+      "location": "room",
+      "actions": {
+        "off": {
+          "power_consumed": 0.0,
+          "effects": [{"property": "charge", "delta": 0.0}]
+        },
+        "charge": {
+          "power_consumed": 17.28,
+          "effects": [{"property": "charge", "delta": 20.0}]
+        }
+      }
+    },
+
+    "Tesla_S_battery": {
+      "type": "sensor",
+      "subtype": "battery",
+      "current_state": 40,
+      "location": "Tesla_S",
+      "sensing_properties": ["charge"]
+    },
+
+    "thermostat_heat": {
+      "type": "sensor",
+      "subtype": "thermostat",
+      "current_state": 18,
+      "location": "room",
+      "sensing_properties": ["temperature_heat"]
+    },
+
+    "thermostat_cool": {
+      "type": "sensor",
+      "subtype": "thermostat",
+      "current_state": 18,
+      "location": "room",
+      "sensing_properties": ["temperature_cool"]
+    },
+
+    "dust_sensor": {
+      "type": "sensor",
+      "subtype": "dust_sensor",
+      "current_state": 0,
+      "location": "room",
+      "sensing_properties": ["cleanliness"]
+    }
+
+  }
+
+}
