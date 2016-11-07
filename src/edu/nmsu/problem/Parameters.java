@@ -10,6 +10,7 @@ public final class Parameters {
     private static double[] priceSchema =
         {0.198, 0.198, 0.198, 0.198, 0.225, 0.225, 0.249, 0.849, 0.849, 0.225, 0.225, 0.198};
     private static long schedulerTimeoutMs = 10000;
+    private static int mgmNbCycles = 50;
 
     public static int getHorizon() {
         return horizon;
@@ -27,5 +28,6 @@ public final class Parameters {
         return deviceDictionaryPath;
     }
 
+    public static int getMGMnbCycles() { return mgmNbCycles; }
 
 }
