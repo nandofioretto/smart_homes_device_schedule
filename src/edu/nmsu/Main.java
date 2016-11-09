@@ -50,7 +50,7 @@ public class Main {
     }
 
     public static String getSummary(Collection<DCOPagent> agents) {
-        String res = "time\tIterAgtMsgs\tnAgtMsgs\tNetLoad\n";
+        String res = "time\tIterAgtMsgs\tnAgtMsgs\tNetLoad\tGain\tCost";
         int maxIter = DCOPinfo.leaderAgent.getAgentStatistics().size();
         long maxTime = 0; int nMsgs = 0; int netLoad = 0;
 

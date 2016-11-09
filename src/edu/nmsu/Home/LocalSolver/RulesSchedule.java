@@ -16,20 +16,22 @@ public class RulesSchedule  {
     private Map<String, ActuatorSchedule> mapSchedules = new HashMap<>();
 
     /** The payoff associated to this schedule instance. */
-    private double utility;
+    private double cost;
 
     /** Is the aggregated (=all actuators) power consumption in KW (of each time step) */
-    private double[] powerConsumptionKw;
+    private Double[] powerConsumptionKw;
 
     /** Is the price paied for this schedule per time step */
-    private double[] pricePerTimeStep;
+    private Double[] pricePerTimeStep;
+
+    private long solvingTimeMs = 0;     // time spend by the scheduler in current iteration
 
     /** Constructor that creates a schedule with an array list of schedule entries */
     public RulesSchedule() {
         int timesteps = Parameters.getHorizon();
-        powerConsumptionKw = new double[timesteps];
-        pricePerTimeStep   = new double[timesteps];
-        utility = 0;
+        powerConsumptionKw = new Double[timesteps];
+        pricePerTimeStep   = new Double[timesteps];
+        cost = 0;
     }
 
     public RulesSchedule(Object obj) {
@@ -39,8 +41,8 @@ public class RulesSchedule  {
         }
 
         int timesteps = Parameters.getHorizon();
-        this.utility   = temp.getUtility();
-        this.powerConsumptionKw = new double[timesteps];
+        this.cost = temp.getCost();
+        this.powerConsumptionKw = new Double[timesteps];
         for (int i = 0; i < timesteps; i++) {
             this.powerConsumptionKw[i] = temp.getPowerConsumptionKw()[i];
         }
@@ -57,7 +59,7 @@ public class RulesSchedule  {
     }
 
     /** The vector of power consumptions */
-    public double[] getPowerConsumptionKw() {
+    public Double[] getPowerConsumptionKw() {
         return powerConsumptionKw;
     }
 
@@ -75,19 +77,27 @@ public class RulesSchedule  {
     }
 
     /** Returns the price cost of this schedule per time steps */
-    public double[] getPricePerTimeStep() {
+    public Double[] getPricePerTimeStep() {
         return pricePerTimeStep;
     }
 
     /** Method get the schedule cost associated to the current schedule */
-    public double getUtility() {return utility; }
+    public double getCost() {return cost; }
 
     /** Method to set the current schedule cost to a new schedule cost */
-    public void setUtility(double utility) { this.utility = utility; }
+    public void setCost(double cost) { this.cost = cost; }
 
     /** method to get the schedule entries for the schedule */
     public Collection<ActuatorSchedule> getSchedule() {
         return mapSchedules.values();
+    }
+
+    public long getSolvingTimeMs() {
+        return solvingTimeMs;
+    }
+
+    public void setSolvingTimeMs(long solvingTimeMs) {
+        this.solvingTimeMs = solvingTimeMs;
     }
 
     @Override
@@ -96,7 +106,7 @@ public class RulesSchedule  {
         for (ActuatorSchedule s : mapSchedules.values()) {
             ret += s.toString() + "\n";
         }
-        ret +=  "\tutility: " + utility + "\n";
+        ret +=  "\tcost: " + cost + "\n";
         ret +=  "\tpowerConsumptionKw: " + Arrays.toString(powerConsumptionKw) + "\n";
         ret +=  "\tpricePerTimeStep: " + Arrays.toString(pricePerTimeStep) + "\n";
 /*

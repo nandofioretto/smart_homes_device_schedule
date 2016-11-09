@@ -22,6 +22,8 @@
 
 package edu.nmsu.communication;
 
+import edu.nmsu.Home.LocalSolver.RulesSchedule;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,12 +38,24 @@ public class AgentStatistics {
     private List<Long> nanoTimeIter;
     private List<Integer[]> solutionBoundsIter;
 
+    private List<Double[]> priceUSDIter;
+    private List<Double[]> powerKWhIter;
+    private List<Long> schedulingTimeMsIter;
+    private List<Double> scheduleCostIter;
+    private List<Double> agentGainIter;
+
     public AgentStatistics() {
         this.stopWatch = new StopWatch();
         sentMessages = 0;
         sentMessagesIter = new ArrayList<>();
         nanoTimeIter = new ArrayList<>();
         solutionBoundsIter = new ArrayList<>();
+        priceUSDIter = new ArrayList<>();
+        powerKWhIter = new ArrayList<>();
+        schedulingTimeMsIter = new ArrayList<>();
+        scheduleCostIter = new ArrayList<>();
+        agentGainIter = new ArrayList<>();
+
     }
 
     public StopWatch getStopWatch() {
@@ -60,6 +74,20 @@ public class AgentStatistics {
         stopWatch.suspend();
         sentMessagesIter.add(sentMessages);
         nanoTimeIter.add(stopWatch.getNanoTime());
+        stopWatch.resume();
+    }
+
+    public void updateIterationStats(RulesSchedule rs, long scheduleTimeMs, double gain) {
+        stopWatch.suspend();
+        sentMessagesIter.add(sentMessages);
+        nanoTimeIter.add(stopWatch.getNanoTime());
+
+        priceUSDIter.add(rs.getPricePerTimeStep());
+        powerKWhIter.add(rs.getPowerConsumptionKw());
+        schedulingTimeMsIter.add(scheduleTimeMs);
+        scheduleCostIter.add(rs.getCost());
+        agentGainIter.add(gain);
+
         stopWatch.resume();
     }
 

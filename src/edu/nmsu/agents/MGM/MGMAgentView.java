@@ -19,4 +19,13 @@ public class MGMAgentView extends AgentView {
     public double[] getNeighborsLoad() {
         return ((MGMAgentState)agentState).getNeighborLoads();
     }
+
+    public long getSolvingTimeMs() {
+        return ((MGMAgentState)agentState).getSolvingTimeMs();
+    }
+
+    public double getGain() {
+        return ((MGMAgentState)agentState).getGain();
+    }
+
 }

@@ -200,6 +200,7 @@ public abstract class CPSolver implements Solver {
         search.setTimeOut(timeoutMs / 1000);
 
         boolean result = search.labeling(store, select, costFunction);
+
         T2 = System.currentTimeMillis();
 
         System.out.println("\n\t*** Execution time = " + (T2 - T1) + " ms");

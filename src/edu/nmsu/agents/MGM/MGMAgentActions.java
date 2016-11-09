@@ -30,7 +30,8 @@ public class MGMAgentActions extends AgentActions {
         solver = new RuleSchedulerSolver( home.getName(), home.getSchedulingRules(), agentState.getBackgroundLoads());
     }
 
-    public MGMAgentActions(MGMAgentState agentState, long solver_timout, double w_price, double w_power) {
+    public MGMAgentActions(MGMAgentState agentState, long solver_timout, double w_price, double w_power)
+    {
         super(agentState);
 
         Home home = agentState.getHome();
@@ -42,15 +43,17 @@ public class MGMAgentActions extends AgentActions {
 
     // If curr_schedule worst than best schedule: Gain > 0 (50 > 40 = 10)
     // If curr_schedule best than best schedule: Gain < 0 (40 < 50 = -10)
-    public double computeGain() {
+    public void computeGain()
+    {
         MGMAgentState state = (MGMAgentState)getAgentState();
-        return (state.getCurrSchedule().getUtility() - state.getBestSchedule().getUtility());
+        state.setGain(state.getCurrSchedule().getCost() - state.getBestSchedule().getCost());
     }
 
-    public boolean isBestGain() {
+    public boolean isBestGain()
+    {
         MGMAgentState mgmAgentState = ((MGMAgentState)getAgentState());
 
-        double gain = computeGain();
+        double gain = mgmAgentState.getGain();
         for (AgentState n : mgmAgentState.getNeighbors()) {
             if ( gain > receivedGains.get(n.getID()).getGain() ) {
                 return false;
@@ -63,53 +66,77 @@ public class MGMAgentActions extends AgentActions {
         receivedGains.clear();
     }
 
-    public void updateBestSchedule(RulesSchedule schedule) {
+    public void updateBestSchedule(RulesSchedule schedule)
+    {
         MGMAgentState mgmAgentState = ((MGMAgentState)getAgentState());
         mgmAgentState.setBestSchedule(schedule);
         mgmAgentState.setCurrSchedule(null);
     }
 
-    public boolean computeSchedule() {
+    public boolean computeSchedule()
+    {
         MGMAgentState mgmAgentState = ((MGMAgentState)getAgentState());
+        long T1, T2;
+        T1 = System.currentTimeMillis();
+
         // Sum neighbors loads
         double[] neighborLoads = new double[Parameters.getHorizon()];
         Arrays.fill(neighborLoads, 0);
 
         for (AgentState n : mgmAgentState.getNeighbors()) {
-            double[] nLoads = receivedGains.get(n.getID()).getEnergyProfile();
+            Double[] nLoads = receivedGains.get(n.getID()).getEnergyProfile();
             neighborLoads = Utilities.sum(neighborLoads, nLoads);
         }
 
         RulesSchedule rs = solver.getSchedule(neighborLoads);
         mgmAgentState.setCurrSchedule(rs);
-        return (rs.getUtility() != Double.MAX_VALUE);
+
+        T2 = System.currentTimeMillis();
+        mgmAgentState.setSolvingTimeMs(T2 - T1);
+
+        return (rs.getCost() != Double.MAX_VALUE);
     }
 
-    public boolean computeFirstSchedule() {
+    public boolean computeFirstSchedule()
+    {
         MGMAgentState mgmAgentState = ((MGMAgentState)getAgentState());
+        long T1, T2;
+        T1 = System.currentTimeMillis();
+
         RulesSchedule rs = solver.getFirstSchedule();
         mgmAgentState.setCurrSchedule(rs);
-        return (rs.getUtility() != Double.MAX_VALUE);
+
+        T2 = System.currentTimeMillis();
+        mgmAgentState.setSolvingTimeMs(T2 - T1);
+
+        return (rs.getCost() != Double.MAX_VALUE);
     }
 
     public boolean computeBaselineSchedule() {
         MGMAgentState mgmAgentState = ((MGMAgentState)getAgentState());
+        long T1, T2;
+        T1 = System.currentTimeMillis();
 
         // Sum neighbors loads
         double[] neighborLoads = new double[Parameters.getHorizon()];
         Arrays.fill(neighborLoads, 0);
 
         for (AgentState n : mgmAgentState.getNeighbors()) {
-            double[] nLoads = receivedGains.get(n.getID()).getEnergyProfile();
+            Double[] nLoads = receivedGains.get(n.getID()).getEnergyProfile();
             neighborLoads = Utilities.sum(neighborLoads, nLoads);
         }
 
         RulesSchedule rs = solver.getBaselineSchedule(neighborLoads);
         mgmAgentState.setCurrSchedule(rs);
-        return (rs.getUtility() != Double.MAX_VALUE);
+
+        T2 = System.currentTimeMillis();
+        mgmAgentState.setSolvingTimeMs(T2 - T1);
+
+        return (rs.getCost() != Double.MAX_VALUE);
     }
 
-    public void storeMessage(long id, int curr_cycle, MGMAgent.GainMessage msg) {
+    public void storeMessage(long id, int curr_cycle, MGMAgent.GainMessage msg)
+    {
         if (curr_cycle == msg.getCycle())
             receivedGains.put(id, msg);
     }

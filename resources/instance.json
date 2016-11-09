@@ -3,7 +3,7 @@
     "priceSchema": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     "agents": {
         "homeA": {
-            "neighbors": ["homeB"],
+            "neighbors": ["homeB", "homeC"],
             "backgroundLoad": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             "rules": [
                 "1	LG_WM2016CW	laundry_wash	eq	2	before	6",
@@ -12,13 +12,23 @@
             ]
         },
         "homeB": {
-            "neighbors": ["homeA"],
+            "neighbors": ["homeA", "homeC"],
             "backgroundLoad": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             "rules": [
                 "1	GE_WSM2420D3WW	laundry_dry	eq	2	before	7",
                 "0	GE_WSM2420D3WW	laundry_dry	geq	0",
                 "0	GE_WSM2420D3WW	laundry_dry	leq	2"
             ]
+        },
+        "homeC": {
+            "neighbors": ["homeA", "homeB"],
+            "backgroundLoad": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             "rules": [
+                "1	Tesla_S	charge	geq	78	within	3	6",
+                "0	Tesla_S	charge	geq	0",
+                "0	Tesla_S	charge	leq	100"
+            ]
         }
     }
 }
+

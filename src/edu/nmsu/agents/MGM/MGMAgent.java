@@ -59,9 +59,9 @@ public class MGMAgent extends DCOPagent {
     protected void onStart() {
         actions.computeFirstSchedule();
         // Send Gain to neighbors
-        double gain = actions.computeGain();
+        actions.computeGain();
         GainMessage gainMessage =
-                new GainMessage(currentCycle, gain, view.getCurrentSchedule().getPowerConsumptionKw());
+                new GainMessage(currentCycle, view.getGain(), view.getCurrentSchedule().getPowerConsumptionKw());
         for (ComAgent neighbor : this.getNeighborsRef() ) {
             this.tell(gainMessage, neighbor);
         }
@@ -69,7 +69,11 @@ public class MGMAgent extends DCOPagent {
         while (!terminationCondition()) {
             //System.out.println("agent: " + getName() + " cycle: " + currentCycle);
             MGMcycle();
-            getAgentStatistics().updateIterationStats();
+
+            getAgentStatistics().updateIterationStats(view.getCurrentSchedule(),
+                    view.getSolvingTimeMs(),
+                    view.getGain());
+
             currentCycle++;
         }
     }
@@ -95,19 +99,16 @@ public class MGMAgent extends DCOPagent {
         // Sums the agent loads and computes the new schedule
         if (actions.computeSchedule())
         {
-            double gain = actions.computeGain();
-            //System.out.println(getName() + ": " +  view.getCurrentSchedule().toString());
+            actions.computeGain();
 
             // Send Gain message to all neighbors
             GainMessage gainMessage =
-                    new GainMessage(currentCycle, gain, view.getCurrentSchedule().getPowerConsumptionKw());
+                    new GainMessage(currentCycle, view.getGain(), view.getCurrentSchedule().getPowerConsumptionKw());
             for (ComAgent neighbor : this.getNeighborsRef() ) {
                 this.tell(gainMessage, neighbor);
             }
 
-
         }
-
     }
 
 
@@ -117,9 +118,9 @@ public class MGMAgent extends DCOPagent {
     public static class GainMessage extends BasicMessage {
         private final int cycle;
         private final double gain;
-        private final double[] energyProfile;
+        private final Double[] energyProfile;
 
-        public GainMessage(int cycle, double gain, double[] energyProfile) {
+        public GainMessage(int cycle, double gain, Double[] energyProfile) {
             this.cycle = cycle;
             this.gain = gain;
             this.energyProfile = energyProfile;
@@ -133,7 +134,7 @@ public class MGMAgent extends DCOPagent {
             return gain;
         }
 
-        public double[] getEnergyProfile() {
+        public Double[] getEnergyProfile() {
             return energyProfile;
         }
 

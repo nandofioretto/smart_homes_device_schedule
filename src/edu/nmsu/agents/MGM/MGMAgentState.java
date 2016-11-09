@@ -17,8 +17,8 @@ public class MGMAgentState extends AgentState {
     private double[] neighborLoads = new double[timeHorizon]; // all zeros
     private RulesSchedule bestSchedule = new RulesSchedule();
     private RulesSchedule currSchedule = new RulesSchedule();
-
-    private double gain = 0;
+    private long solvingTimeMs = 0;     // time spend by the scheduler in current iteration
+    private double gain = Double.MAX_VALUE;
 
     public MGMAgentState(String name, long ID, Home pHome, double[] bgLoads) {
         super(name, ID);
@@ -49,9 +49,12 @@ public class MGMAgentState extends AgentState {
         return bestSchedule;
     }
 
-    public void savePrevSchedule() {
-        // RulesSchedule temp = currSchedule;
-        bestSchedule = currSchedule;
+    public long getSolvingTimeMs() {
+        return solvingTimeMs;
+    }
+
+    public void setSolvingTimeMs(long solvingTimeMs) {
+        this.solvingTimeMs = solvingTimeMs;
     }
 
     public void setBestSchedule(RulesSchedule bestSchedule) {

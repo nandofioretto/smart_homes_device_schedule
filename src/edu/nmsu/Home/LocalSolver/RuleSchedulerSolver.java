@@ -357,7 +357,7 @@ public class RuleSchedulerSolver extends CPSolver {
 //            if (debug.schedule())
 //                printPredictiveModels();
             return constructSchedule();
-        } else {  //if search fails, create a generic RulesSchedule object and set utility to max size of double.
+        } else {  //if search fails, create a generic RulesSchedule object and set cost to max size of double.
             RulesSchedule rulesSchedule = new RulesSchedule();
             System.out.println("Error: Schedule not found!");
 
@@ -369,7 +369,7 @@ public class RuleSchedulerSolver extends CPSolver {
             }
             */
 
-            rulesSchedule.setUtility(Double.MAX_VALUE);
+            rulesSchedule.setCost(Double.MAX_VALUE);
             return rulesSchedule;
         }
     }
@@ -386,7 +386,7 @@ public class RuleSchedulerSolver extends CPSolver {
             if (debug.schedule())
                 printPredictiveModels();
             return constructSchedule();
-        } else {  //if search fails, create a generic RulesSchedule object and set utility to max size of double.
+        } else {  //if search fails, create a generic RulesSchedule object and set cost to max size of double.
             System.out.println("Error: First Schedule not found!");
             RulesSchedule rulesSchedule = new RulesSchedule();
 
@@ -398,7 +398,7 @@ public class RuleSchedulerSolver extends CPSolver {
             }
             */
 
-            rulesSchedule.setUtility(Double.MAX_VALUE);
+            rulesSchedule.setCost(Double.MAX_VALUE);
             return rulesSchedule;
         }
     }
@@ -412,7 +412,7 @@ public class RuleSchedulerSolver extends CPSolver {
             if (debug.schedule())
                 printPredictiveModels();
             return constructSchedule();
-        } else { //if search fails, create a generic RulesSchedule object and set utility to max size of double.
+        } else { //if search fails, create a generic RulesSchedule object and set cost to max size of double.
             System.out.println("Error: Baseline Schedule not found!");
             RulesSchedule rulesSchedule = new RulesSchedule();
 
@@ -424,7 +424,7 @@ public class RuleSchedulerSolver extends CPSolver {
             }
             */
 
-            rulesSchedule.setUtility(Double.MAX_VALUE);
+            rulesSchedule.setCost(Double.MAX_VALUE);
             return rulesSchedule;
         }
     }
@@ -457,8 +457,8 @@ public class RuleSchedulerSolver extends CPSolver {
             double power = var_aggrPower[t].value() / (double)getKiloWattToWatt();
             rulesSchedule.setPowerConsumptionKw(t, power);
         }
-        // Set utility of this schedule
-        rulesSchedule.setUtility((double)costFunction.value()/scaleFactor);
+        // Set cost of this schedule
+        rulesSchedule.setCost((double)costFunction.value()/scaleFactor);
 
         return rulesSchedule;
     }
