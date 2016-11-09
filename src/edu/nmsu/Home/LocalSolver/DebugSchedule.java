@@ -9,14 +9,14 @@ package edu.nmsu.Home.LocalSolver;
  */
 
 public class DebugSchedule {
-    public boolean intro()          { return  true; }
-    public boolean schedule()       { return  true; }
-    public boolean power()          { return  true; }
-    public boolean delta()          { return  true; }
+    public boolean intro()          { return false; }
+    public boolean schedule()       { return false; }
+    public boolean power()          { return false; }
+    public boolean delta()          { return false; }
 
-    public boolean predictiveModel(){ return true; }
-    public boolean rules()          { return true; }
-    public boolean objPower()       { return true; }
-    public boolean price()          { return true; }
+    public boolean predictiveModel(){ return false; }
+    public boolean rules()          { return false; }
+    public boolean objPower()       { return false; }
+    public boolean price()          { return false; }
 
 }

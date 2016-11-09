@@ -76,6 +76,11 @@ public class RuleSchedulerSolver extends CPSolver {
 
     private Pair<Integer, Integer> aggregatedPowerBounds = new Pair<>(0,0);
     private Pair<Integer, Integer> aggregatedPriceBounds = new Pair<>(0,0);
+
+    // weights objective functions
+    int alphaPrice = 1;
+    int alphaPower = 1;
+
 //    private int MIN_AGGREGATED_POWER  = -1;
 //    private int MAX_AGGREGATED_POWER  = -1;
 //    private int MAX_AGGREGATED_PRICE  = -1;
@@ -108,7 +113,8 @@ public class RuleSchedulerSolver extends CPSolver {
         else
             this.bgLoadsKWh = new double[HORIZON];
 
-        if (debug.intro()) System.out.println( separatorString + "TEST start: Intro" + separatorString);
+        if (debug.intro())
+            System.out.println( separatorString + "TEST start: Intro" + separatorString);
 
 
         // Initializes all (activated) Scheduling Rules
@@ -212,6 +218,10 @@ public class RuleSchedulerSolver extends CPSolver {
         populatePowerArray(power);
     }
 
+    public void setWeights(int w_price, int w_power) {
+        alphaPrice = w_price;
+        alphaPower = w_power;
+    }
 
     @Override
     public void model(double[] neighborPower) {
@@ -236,14 +246,9 @@ public class RuleSchedulerSolver extends CPSolver {
         // Variables
         ////////////////////////////////
         var_predModel = new IntVar[PREDMODEL_SIZE][HORIZON];
-        //TODO: These are not decision variables!
-        int MIN_PROPERTY_DOMAIN = -200 * deltaScale; //(currently) MIN: -2000 MAX: 2000
-        int MAX_PROPERTY_DOMAIN =  200 * deltaScale; //TODO: play with these values
         createIntVar2DArray(var_predModel, store, "predModel",
                 IntDomain.MinInt,
                 IntDomain.MaxInt);
-//                MIN_PROPERTY_DOMAIN,
-//                MAX_PROPERTY_DOMAIN);
 
         var_aggrPower = new IntVar[HORIZON];
         createIntVarArray(var_aggrPower, store, "aggrPower",
@@ -310,8 +315,6 @@ public class RuleSchedulerSolver extends CPSolver {
         createObjectivePrice(objPrice, var_aggrPower, powerPriceKWh);
 
 
-        int alphaPrice = 1;
-        int alphaPower = 1;
         // normalize:
 //        System.out.println("max power: " + objPowerDiff.max() + "  max price: " + objPrice.max());
 //        if (objPowerDiff.max() > objPrice.max()) {
@@ -319,7 +322,11 @@ public class RuleSchedulerSolver extends CPSolver {
 //        } else {
 //            alphaPower = Math.max(1, objPrice.max()/objPowerDiff.max());
 //        }
-        System.out.println("========================\nobjPowerDiff: " + objPowerDiff.max() + "\nobjPrice: " + objPrice.max() + "\n=======================");
+        if (debug.objPower()) {
+            System.out.println("========================\nobjPowerDiff: " + objPowerDiff.max()
+                    + "\nobjPrice: " + objPrice.max() + "\n=======================");
+        }
+
         int maxDom = (alphaPower * objPowerDiff.max() + alphaPrice * objPrice.max());
         costFunction = new IntVar(store, "costFunction", 0, maxDom);
         Constraint ctr = new LinearInt(store,
@@ -347,8 +354,8 @@ public class RuleSchedulerSolver extends CPSolver {
         //super.BranchAndBound();
 
         if (super.searchMostConstrainedStatic()) {
-            if (debug.schedule())
-                printPredictiveModels();
+//            if (debug.schedule())
+//                printPredictiveModels();
             return constructSchedule();
         } else {  //if search fails, create a generic RulesSchedule object and set utility to max size of double.
             RulesSchedule rulesSchedule = new RulesSchedule();
@@ -725,7 +732,8 @@ public class RuleSchedulerSolver extends CPSolver {
      */
     private void createObjectivePower(IntVar objPowerDiff, IntVar[] var_aggrPower, double[] neighborhsKW) {
 
-        if(debug.objPower()) System.out.println(separatorString + "TEST Start Obj: Power " + separatorString);
+        if(debug.objPower())
+            System.out.println(separatorString + "TEST Start Obj: Power " + separatorString);
 
         int minNeighb = scaleAndRoundPower(Utilities.getMin(neighborhsKW));
         int maxNeighb = scaleAndRoundPower(Utilities.getMax(neighborhsKW));

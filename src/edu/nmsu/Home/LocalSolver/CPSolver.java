@@ -8,6 +8,9 @@ import org.jacop.core.Store;
 import org.jacop.core.Var;
 import org.jacop.search.*;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+
 /**
  * Created by nandofioretto on 11/1/16.
  */
@@ -19,12 +22,15 @@ public abstract class CPSolver implements Solver {
     /** It specifies the cost function, null if no cost is used. */
     protected IntVar costFunction;
 
-    protected int bestCost = 1000000;
+    protected int bestCost = Integer.MAX_VALUE;
+
     /** It specifies the constraint store. */
     public Store store;
 
     /** It specifies the search procedure used by a given instance. */
     protected Search<IntVar> search;
+
+    protected long timeoutMs = 300000;
 
     /** The solving time horizon */
     protected final int HORIZON = Parameters.getHorizon(); // 15 minute intervals over 24 hours
@@ -54,6 +60,18 @@ public abstract class CPSolver implements Solver {
     protected int getCentsToDollars() {
         return centsToDollars;
     }
+
+    public void setTimeoutMs(long timeoutMs) {
+        this.timeoutMs = timeoutMs;
+    }
+
+    protected PrintStream dummyStream  = new PrintStream(new OutputStream(){
+        public void write(int b) {
+            //NO-OP
+        }
+    });
+    protected PrintStream originalStream = System.out;
+
 
     /**
      * It creates an array of int variables
@@ -123,7 +141,7 @@ public abstract class CPSolver implements Solver {
 
         SelectChoicePoint<IntVar> select =
                 new SimpleSelect<>(vars, null, new IndomainMin<>());
-        search.setTimeOut(Parameters.getSchedulerTimeoutMs() / 1000);
+        search.setTimeOut(timeoutMs / 1000);
 
         boolean result = search.labeling(store, select, costFunction);
         T2 = System.currentTimeMillis();
@@ -134,18 +152,13 @@ public abstract class CPSolver implements Solver {
     }
 
     protected boolean searchSatisfaction() {
-        long T1, T2;
-        T1 = System.currentTimeMillis();
-
+        System.setOut(dummyStream);
         SelectChoicePoint<IntVar> select =
                 new SimpleSelect<>(vars, null, new IndomainMax<>());
         search = new DepthFirstSearch<>();
-        search.setTimeOut(Parameters.getSchedulerTimeoutMs() / 1000);
+        search.setTimeOut(timeoutMs / 1000);
         boolean result = search.labeling(store, select);
-
-        T2 = System.currentTimeMillis();
-        System.out.println("\n\t*** Execution time = " + (T2 - T1) + " ms");
-
+        System.setOut(originalStream);
         return result;
     }
 
@@ -155,19 +168,14 @@ public abstract class CPSolver implements Solver {
      * @return true if there is a solution, false otherwise.
      */
     protected boolean searchSmallestDomain() {
-        long T1, T2;
-        T1 = System.currentTimeMillis();
-
+        System.setOut(dummyStream);
         SelectChoicePoint<IntVar> select =
                 new SimpleSelect<>(vars, new SmallestDomain<>(), new IndomainMin<>());
         search = new DepthFirstSearch<>();
-        search.setTimeOut(Parameters.getSchedulerTimeoutMs() / 1000);
+        search.setTimeOut(timeoutMs / 1000);
 
         boolean result = search.labeling(store, select, costFunction);
-
-        T2 = System.currentTimeMillis();
-        System.out.println("\n\t*** Execution time = " + (T2 - T1) + " ms");
-
+        System.setOut(originalStream);
         return result;
     }
 
@@ -189,7 +197,7 @@ public abstract class CPSolver implements Solver {
                 new IndomainMin<>());
 
         search = new DepthFirstSearch<>();
-        search.setTimeOut(Parameters.getSchedulerTimeoutMs() / 1000);
+        search.setTimeOut(timeoutMs / 1000);
 
         boolean result = search.labeling(store, select, costFunction);
         T2 = System.currentTimeMillis();
@@ -206,19 +214,17 @@ public abstract class CPSolver implements Solver {
      * @return true if there is a solution, false otherwise.
      */
     protected boolean searchMostConstrainedStatic() {
-        long T1, T2;
-        T1 = System.currentTimeMillis();
+        System.setOut(dummyStream);
 
         search = new DepthFirstSearch<>();
-        search.setTimeOut(Parameters.getSchedulerTimeoutMs() / 1000);
+        search.setTimeOut(timeoutMs / 1000);
 
         SelectChoicePoint<IntVar> select = new SimpleSelect<>(vars,
                 new MostConstrainedStatic<>(), new IndomainMin<>());
 
         boolean result = search.labeling(store, select, costFunction);
-        T2 = System.currentTimeMillis();
+        System.setOut(originalStream);
 
-        System.out.println("\n\t*** Execution time = " + (T2 - T1) + " ms");
         return result;
     }
 
@@ -230,7 +236,7 @@ public abstract class CPSolver implements Solver {
     protected boolean searchLDS(int noDiscrepancy) {
 
         search = new DepthFirstSearch<>();
-        search.setTimeOut(Parameters.getSchedulerTimeoutMs() / 1000);
+        search.setTimeOut(timeoutMs / 1000);
         boolean result; // false by default
         SelectChoicePoint<IntVar> select =
                 new SimpleSelect<>(vars, new SmallestDomain<>(), new IndomainMiddle<>());
@@ -267,6 +273,7 @@ public abstract class CPSolver implements Solver {
         int decisions = 0;
         int backtracks = 0;
         int wrongDecisions = 0;
+        System.setOut(dummyStream);
 
         search = new DepthFirstSearch<>();
 
@@ -306,6 +313,8 @@ public abstract class CPSolver implements Solver {
             search.setExitListener(collector);
             //System.out.println("++++++" + timeout);
         }
+        System.setOut(originalStream);
+
 
         return result;
     }

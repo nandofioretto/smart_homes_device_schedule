@@ -15,7 +15,10 @@ public class MGMAgentState extends AgentState {
     private final int timeHorizon = Parameters.getHorizon();
     private double[] backgroundLoads = new double[timeHorizon]; // all zeros
     private double[] neighborLoads = new double[timeHorizon]; // all zeros
-    private RulesSchedule homeSchedule;
+    private RulesSchedule bestSchedule = new RulesSchedule();
+    private RulesSchedule currSchedule = new RulesSchedule();
+
+    private double gain = 0;
 
     public MGMAgentState(String name, long ID, Home pHome, double[] bgLoads) {
         super(name, ID);
@@ -25,18 +28,42 @@ public class MGMAgentState extends AgentState {
             neighborLoads[j] = 0;
         for (int j = 0; j < backgroundLoads.length; j++)
             backgroundLoads[j] = bgLoads[j];
+
+//        registerVariable(new IntVariable(name, ID, 0,0));
+//        registerConstraint(new TableBinaryConstraint());
     }
 
     public Home getHome() {
         return home;
     }
 
-    public RulesSchedule getHomeSchedule() {
-        return homeSchedule;
+    public RulesSchedule getCurrSchedule() {
+        return currSchedule;
     }
 
-    public void setHomeSchedule(RulesSchedule homeSchedule) {
-        this.homeSchedule = homeSchedule;
+    public void setCurrSchedule(RulesSchedule currSchedule) {
+        this.currSchedule = currSchedule;
+    }
+
+    public RulesSchedule getBestSchedule() {
+        return bestSchedule;
+    }
+
+    public void savePrevSchedule() {
+        // RulesSchedule temp = currSchedule;
+        bestSchedule = currSchedule;
+    }
+
+    public void setBestSchedule(RulesSchedule bestSchedule) {
+        this.bestSchedule = bestSchedule;
+    }
+
+    public double getGain() {
+        return gain;
+    }
+
+    public void setGain(double gain) {
+        this.gain = gain;
     }
 
     public double[] getBackgroundLoads() {

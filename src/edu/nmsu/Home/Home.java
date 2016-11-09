@@ -4,12 +4,12 @@ import edu.nmsu.Home.Devices.Actuator;
 import edu.nmsu.Home.Devices.Device;
 import edu.nmsu.Home.Devices.Sensor;
 import edu.nmsu.Home.LocalSolver.Solver;
-import edu.nmsu.Home.Rules.RuleType;
-import edu.nmsu.problem.Parameters;
-import edu.nmsu.problem.Utilities;
 import edu.nmsu.Home.Rules.PredictiveModel;
 import edu.nmsu.Home.Rules.PredictiveModelFactory;
+import edu.nmsu.Home.Rules.RuleType;
 import edu.nmsu.Home.Rules.SchedulingRule;
+import edu.nmsu.problem.Parameters;
+import edu.nmsu.problem.Utilities;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -42,6 +42,12 @@ public class Home {
         createPredictiveModels();
     }
 
+    public void addRule(SchedulingRule rule) {
+        schedulingRules.add(rule);
+    }
+
+
+    @Deprecated
     public void readSchedulingRules(String file) throws IOException {
         // Construct BufferedReader from FileReader
         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -51,8 +57,9 @@ public class Home {
             schedulingRules.add( new SchedulingRule(line, name) );
         }
         br.close();
+    }
 
-
+    public void activatePassiveRules() {
         // Once all the scheduling rules have been read, we activate a "passive rule" R iff there
         // exists an "active rule" which involves devices whose actions influence the property of R.
         for (SchedulingRule pr : schedulingRules) {
@@ -130,16 +137,20 @@ public class Home {
     public String toString() {
         String str = " Home: " + name;
         for (Actuator a : actuators) {
-            str += a.toString() + "\n";
+            if (a.isActive())
+                str += a.toString() + "\n";
         }
         for (Sensor s : sensors) {
-            str += s.toString() + "\n";
+            if (s.isActive())
+                str += s.toString() + "\n";
         }
         for (PredictiveModel m : predictiveModels) {
-            str += m.toString() + "\n";
+            if (m.isActive())
+                str += m.toString() + "\n";
         }
         for (SchedulingRule r : schedulingRules) {
-            str += r.toString() + "\n";
+            if (r.isActive())
+                str += r.toString() + "\n";
         }
         return str;
     }

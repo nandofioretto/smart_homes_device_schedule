@@ -23,6 +23,7 @@
 package edu.nmsu.communication;
 
 import edu.nmsu.agents.MGM.MGMAgent;
+import edu.nmsu.agents.MGM.MGMAgentState;
 import edu.nmsu.kernel.AgentState;
 import edu.nmsu.kernel.DCOPInstance;
 
@@ -82,6 +83,7 @@ public class Spawner {
         // Links Agent Neighbors as ComAgent objects.
         for (AgentState agtState : this.spawnedAgentStates) {
             ComAgent actor = yellowPages.get(agtState.getName());
+
             for (AgentState neighbor : agtState.getNeighbors()) {
                 DCOPagent neighborAgt = yellowPages.get(neighbor.getName());
                 actor.tell(new Messages.RegisterNeighbor(neighborAgt, neighborAgt.getId()), ComAgent.noSender());
@@ -116,7 +118,7 @@ public class Spawner {
     }
 
     private DCOPagent DCOPagentFactory(List<Object> algParameters, ComAgent statsCollector, AgentState agtState) {
-        return new MGMAgent(statsCollector, agtState, algParameters);
+        return new MGMAgent(statsCollector, (MGMAgentState)agtState, algParameters);
         // return new DLNSagent(statsCollector, agtState, algParameters);
     }
 

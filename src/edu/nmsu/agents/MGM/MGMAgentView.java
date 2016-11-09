@@ -1,10 +1,7 @@
 package edu.nmsu.agents.MGM;
 
 import edu.nmsu.Home.LocalSolver.RulesSchedule;
-import edu.nmsu.kernel.AgentState;
 import edu.nmsu.kernel.AgentView;
-
-import java.util.ArrayList;
 
 /**
  * Created by nandofioretto on 11/6/16.
@@ -15,12 +12,8 @@ public class MGMAgentView extends AgentView {
         super(agentState);
     }
 
-    public ArrayList<AgentState> getNeighbors() {
-        return agentState.getNeighbors();
-    }
-
     public RulesSchedule getCurrentSchedule() {
-        return ((MGMAgentState)agentState).getHomeSchedule();
+        return ((MGMAgentState)agentState).getCurrSchedule();
     }
 
     public double[] getNeighborsLoad() {

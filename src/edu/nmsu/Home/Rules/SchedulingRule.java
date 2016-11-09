@@ -127,18 +127,18 @@ public class SchedulingRule {
 
     @Override
     public String toString() {
-        return "SchedulingRule{" +
-                "type=" + type +
-                ", location='" + location + '\'' +
-                ", property=" + property +
-                ", relation=" + relation +
-                ", goalState=" + goalState +
-                ", timePrefix=" + timePrefix +
-                ", timeStart=" + timeStart +
-                ", timeEnd=" + timeEnd +
-                ", predicate=" + predicate +
-                "\n\t predictiveModel=" + predictiveModel +
-                '}';
+            return "SchedulingRule{" +
+                    "type=" + type +
+                    ", location='" + location + '\'' +
+                    ", property=" + property +
+                    ", relation=" + relation +
+                    ", goalState=" + goalState +
+                    ", timePrefix=" + timePrefix +
+                    ", timeStart=" + timeStart +
+                    ", timeEnd=" + timeEnd +
+                    ", predicate=" + predicate +
+                    "\n\t predictiveModel=" + predictiveModel +
+                    '}';
     }
 
 

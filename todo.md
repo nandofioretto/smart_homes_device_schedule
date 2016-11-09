@@ -1,15 +1,24 @@
 
-- [ ] Multiagent spport
+- [x] Multiagent spport
     - [x] Create agent class
-    - [ ] Create instance class
-    - [ ] Modify input file (2 agents)
-    - [ ] Test
-    - [ ] Agent spowner
+    - [x] Create instance class
+    - [x] Modify input file (2 agents)
+    - [x] Test
+    - [x] Agent spowner
 
-- [ ] MGM Algorithm:
-    - [ ] Copy first cycle instructions.
-    - [ ] Test algorithm with only first cycle
-    - [ ] Create data structure to store neighboring states (retrieve energy consumption, retrieve gain)
-    - [ ] Create functions to check messages received
-    - [ ] Create statistics data structure
-    
+- [x] MGM Algorithm:
+    - [x] Copy first cycle instructions.
+    - [x] Test algorithm with only first cycle
+    - [x] Create data structure to store neighboring states (retrieve energy consumption, retrieve gain)
+    - [x] Create functions to check messages received
+
+- [ ] Create statistics data structure
+    - [x] Check messages and runtime of my framework
+    - [ ] Extend messages, runtime, solverTime, etc. per cycle (in AgentStatistics.java directly)
+
+- [x] Integrate Parameters from input to solver (timeout, weights)
+
+- [ ] Build simple rule generator
+- [ ] Build smart homes topology generator 
+
+

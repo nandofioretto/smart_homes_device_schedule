@@ -65,7 +65,7 @@ public class PredictiveModel
         return actuators;
     }
 
-    public Boolean getActive() {
+    public Boolean isActive() {
         return active;
     }
 
@@ -75,6 +75,7 @@ public class PredictiveModel
         for (Actuator a: actuators)
             a.setActive(true);
     }
+
 
     @Override
     public String toString() {

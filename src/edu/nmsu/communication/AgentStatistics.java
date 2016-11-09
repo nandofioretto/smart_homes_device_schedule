@@ -72,7 +72,7 @@ public class AgentStatistics {
     }
 
     public int size() {
-        return solutionBoundsIter.size();
+        return nanoTimeIter.size();
     }
 
     public int getSentMessages() {

@@ -29,6 +29,7 @@ public class RulesSchedule  {
         int timesteps = Parameters.getHorizon();
         powerConsumptionKw = new double[timesteps];
         pricePerTimeStep   = new double[timesteps];
+        utility = 0;
     }
 
     public RulesSchedule(Object obj) {

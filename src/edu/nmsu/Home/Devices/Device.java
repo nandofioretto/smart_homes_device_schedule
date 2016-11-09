@@ -29,7 +29,7 @@ public class Device {
         return location;
     }
 
-    public Boolean getActive() {
+    public Boolean isActive() {
         return active;
     }
 

@@ -43,6 +43,8 @@ public abstract class ComAgent extends Thread { //implements Runnable {
     private ComAgent leaderRef = null;
     private AgentStatistics agentStatistics;
     private BlockingQueue<TrackableObject> mailbox;
+    private final long initSleepingTimeMs = 5;
+    private long sleepingTimeMs = initSleepingTimeMs;
     //String name;
 
     public ComAgent(String name, long agentID) {
@@ -98,8 +100,9 @@ public abstract class ComAgent extends Thread { //implements Runnable {
      */
     public void tell(Object message, ComAgent sender) {
         try {
-//            String sName = sender == null ? "none" : sender.getName();
-//            System.out.println(sName + " sending " + message.toString() + " to " + getName());
+            String sName = sender == null ? "none" : sender.getName();
+            System.out.println(sName + " sending " + message.toString() + " to " + getName());
+
             mailbox.put(new TrackableObject(message, sender));
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -117,6 +120,10 @@ public abstract class ComAgent extends Thread { //implements Runnable {
         if (message.isTrackable())
             message.setSimulatedNanoTime(sender.getAgentStatistics().getStopWatch().getNanoTime());
         try {
+
+            String sName = sender == null ? "none" : sender.getName();
+            System.out.println(sName + " sending " + message.toString() + " to " + getName());
+
             mailbox.put(new TrackableObject(message, sender));
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -129,22 +136,25 @@ public abstract class ComAgent extends Thread { //implements Runnable {
 
     /**
      * Awaits while checking if the message queue is non empty. In which case, it process the message.
-     * TODO: Change for await to some condition?
      */
     public void await() {
         agentStatistics.getStopWatch().suspend();
 
-        if (mailbox.isEmpty()) {
-            Thread.yield();
-        } else {
-            try {
+        try {
+            if (mailbox.isEmpty()) {
+                sleepingTimeMs *= 2;
+                Thread.sleep(sleepingTimeMs);
+                // Thread.yield();
+            } else {
+                sleepingTimeMs = initSleepingTimeMs;
+
                 TrackableObject to = mailbox.take();
 
                 agentStatistics.getStopWatch().resume();
                 onReceive(to.getObject(), to.getTrack());
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

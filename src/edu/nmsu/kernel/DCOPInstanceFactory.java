@@ -22,6 +22,12 @@
 
 package edu.nmsu.kernel;
 
+import edu.nmsu.Home.Home;
+import edu.nmsu.Home.Rules.SchedulingRule;
+import edu.nmsu.agents.MGM.MGMAgentState;
+import edu.nmsu.problem.Utilities;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -29,7 +35,11 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -39,15 +49,13 @@ import java.util.regex.Pattern;
  */
 public class DCOPInstanceFactory {
 
-    private static final int XCSP_TYPE = 0;
-    private static final int DZINC_TYPE = 1;
-    private static final int USC_TYPE = 2;
+    public enum Type {xcsp, dzink, usc, smartHomeRules};
 
     public static DCOPInstance importDCOPInstance(String filename) {
-        return importDCOPInstance(filename, -1);
+        return importDCOPInstance(filename, Type.smartHomeRules);
     }
 
-    public static DCOPInstance importDCOPInstance(String filename, int type) {
+    public static DCOPInstance importDCOPInstance(String filename, Type type) {
 
         String ext = "";
         int i = filename.lastIndexOf('.');
@@ -55,13 +63,16 @@ public class DCOPInstanceFactory {
             ext = filename.substring(i+1);
         }
 
-        if (ext.equalsIgnoreCase("xcsp") || ext.equalsIgnoreCase("xml") || type == XCSP_TYPE) {
+        if (ext.equalsIgnoreCase("xcsp") || ext.equalsIgnoreCase("xml") || type == Type.xcsp) {
             return createXCSPInstance(filename);
-        } else if (ext.equalsIgnoreCase("usc") || type == USC_TYPE) {
+        } else if (ext.equalsIgnoreCase("usc") || type == Type.usc) {
             return createUSCInstance(filename);
-        } else if (ext.equalsIgnoreCase("dzn") || type == DZINC_TYPE) {
+        } else if (ext.equalsIgnoreCase("dzn") || type == Type.dzink) {
             return createDZINCInstance(filename);
+        } else if (type == Type.smartHomeRules) {
+            return createSHDSInstance(filename);
         }
+
         return null;
     }
 
@@ -175,7 +186,6 @@ public class DCOPInstanceFactory {
         return null;
     }
 
-
     /**
      * Get the XMLNode of the given categroy matching the given name.
      * @param doc The XML document.
@@ -193,6 +203,73 @@ public class DCOPInstanceFactory {
             }
         }
         return null;
+    }
+
+
+    private static DCOPInstance createSHDSInstance(String filename) {
+
+        DCOPInstance instance = new DCOPInstance();
+        Map<String, JSONArray> mapNeighbors = new HashMap<>();
+
+        String content = null;
+        try {
+            content = Utilities.readFile(filename);
+
+            JSONObject jObject  = new JSONObject(content.trim());
+            int horizon = jObject.getInt("horizon");
+
+            jObject.getJSONArray("priceSchema");   // todo
+
+            JSONObject jAgents = jObject.getJSONObject("agents");
+            Iterator<?> keys = jAgents.keys();
+
+            int agt_id = 0;
+            while( keys.hasNext() ) {
+                String name = (String)keys.next();
+                if ( jAgents.get(name) instanceof JSONObject ) {
+                    JSONObject jAgent = jAgents.getJSONObject(name);
+
+                    // Background loads
+                    JSONArray jBgLoad = jAgent.getJSONArray("backgroundLoad");
+                    double[] bgLoads = new double[horizon];
+                    for (int i = 0; i < horizon; i++) {
+                        bgLoads[i] = jBgLoad.getDouble(i);
+                    }
+
+                    // Create Home
+                    Home home = new Home(name);
+
+                    // Load Rules
+                    JSONArray jRules = jAgent.getJSONArray("rules");
+                    for (int r = 0; r < jRules.length(); r++) {
+                        home.addRule( new SchedulingRule(jRules.getString(r), home.getName()) );
+                    }
+                    home.activatePassiveRules();
+
+                    // Create and store Agent in DCOP instance
+                    MGMAgentState state = new MGMAgentState(name, agt_id++, home, bgLoads);
+                    instance.addAgent(state);
+
+                    // save Neighbors
+                    JSONArray jNeighbors = jAgent.getJSONArray("neighbors");
+                    mapNeighbors.put(name, jNeighbors);
+                }
+            }
+
+            // Link Neighbors
+            for (AgentState agtState : instance.getDCOPAgents()) {
+                JSONArray jNeighbors = mapNeighbors.get(agtState.getName());
+                for (int i = 0; i < jNeighbors.length(); i++) {
+                    AgentState neighbor = instance.getAgent(jNeighbors.getString(i));
+                    agtState.registerNeighbor(neighbor);
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return instance;
     }
 
 
