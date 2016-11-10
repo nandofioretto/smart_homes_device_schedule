@@ -12,8 +12,6 @@ import edu.nmsu.problem.Parameters;
 import edu.nmsu.problem.Utilities;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -44,19 +42,6 @@ public class Home {
 
     public void addRule(SchedulingRule rule) {
         schedulingRules.add(rule);
-    }
-
-
-    @Deprecated
-    public void readSchedulingRules(String file) throws IOException {
-        // Construct BufferedReader from FileReader
-        BufferedReader br = new BufferedReader(new FileReader(file));
-
-        String line = br.readLine(); // skip first line
-        while ((line = br.readLine()) != null) {
-            schedulingRules.add( new SchedulingRule(line, name) );
-        }
-        br.close();
     }
 
     public void activatePassiveRules() {

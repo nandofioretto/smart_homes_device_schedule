@@ -65,6 +65,30 @@
       "sensing_properties": ["laundry_wash"]
     },
 
+    "LG_WM2016CW_2" : {
+      "type": "actuator",
+      "subtype": "cloths_washer",
+      "location": "basement",
+      "actions": {
+        "off": {
+          "power_consumed": 0.0,
+          "effects": [{"property": "laundry_wash", "delta": 0.0}]
+        },
+        "reg_cycle": {
+          "power_consumed": 5.76,
+          "effects": [{"property": "laundry_wash", "delta": 1.0}]
+        }
+      }
+    },
+
+    "LG_WM2016CW_2_sensor": {
+      "type": "sensor",
+      "current_state": 0,
+      "subtype": "cloths_washer",
+      "location": "LG_WM2016CW_2",
+      "sensing_properties": ["laundry_wash"]
+    },
+
     "GE_WSM2420D3WW" : {
       "type": "actuator",
       "subtype": "cloths_dryer",

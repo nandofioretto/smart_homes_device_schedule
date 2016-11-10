@@ -5,6 +5,7 @@ import edu.nmsu.communication.DCOPinfo;
 import edu.nmsu.communication.Spawner;
 import edu.nmsu.kernel.DCOPInstance;
 import edu.nmsu.kernel.DCOPInstanceFactory;
+import edu.nmsu.problem.Generator;
 import edu.nmsu.problem.Parameters;
 
 import java.util.ArrayList;
@@ -14,6 +15,9 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
+
+//        generateSHDSInstances();
+//        return;
 
         int timeHorizon = Parameters.getHorizon();
 
@@ -36,9 +40,13 @@ public class Main {
 
 //        // Summary Output
         System.out.println(getSummary(spawner.getSpawnedAgents()));
-
     }
 
+
+    public static void generateSHDSInstances() {
+        Generator gen = new Generator(10, 500, 250);
+        gen.topologyGenerator();
+    }
 
     public static String getUsage() {
         return "dcop_jtool FILE.xml [options]\n" +

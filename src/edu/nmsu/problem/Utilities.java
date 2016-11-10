@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by nandofioretto on 11/4/16.
  */
 public class Utilities {
+
+    private static Random rand = new Random();
 
     public static String readFile(String path)
             throws IOException
@@ -93,6 +96,20 @@ public class Utilities {
             a[i] += b[i];
         }
         return a;
+    }
+
+    public static int genRand(int a, int b) {
+        return rand.nextInt(b - a + 1) + a;
+    }
+
+    public static String genRand(String[] array) {
+        int idx = rand.nextInt(array.length);
+        return array[idx];
+    }
+
+    public static int genRand(int[] array) {
+        int idx = rand.nextInt(array.length);
+        return array[idx];
     }
 
 }

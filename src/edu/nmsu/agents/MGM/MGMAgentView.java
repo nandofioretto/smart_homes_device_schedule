@@ -28,4 +28,8 @@ public class MGMAgentView extends AgentView {
         return ((MGMAgentState)agentState).getGain();
     }
 
+    public RulesSchedule getBestSchedule() {
+        return ((MGMAgentState)agentState).getBestSchedule();
+    }
+
 }

@@ -70,7 +70,7 @@ public class MGMAgent extends DCOPagent {
             //System.out.println("agent: " + getName() + " cycle: " + currentCycle);
             MGMcycle();
 
-            getAgentStatistics().updateIterationStats(view.getCurrentSchedule(),
+            getAgentStatistics().updateIterationStats(view.getBestSchedule(),
                     view.getSolvingTimeMs(),
                     view.getGain());
 
@@ -80,6 +80,7 @@ public class MGMAgent extends DCOPagent {
 
     @Override
     protected void onStop() {
+        System.out.println(view.getBestSchedule().toString());
     }
 
     public void MGMcycle() {

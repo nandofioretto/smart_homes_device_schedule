@@ -12,13 +12,17 @@
     - [x] Create data structure to store neighboring states (retrieve energy consumption, retrieve gain)
     - [x] Create functions to check messages received
 
-- [ ] Create statistics data structure
+- [x] Create statistics data structure
     - [x] Check messages and runtime of my framework
-    - [ ] Extend messages, runtime, solverTime, etc. per cycle (in AgentStatistics.java directly)
+    - [x] Extend messages, runtime, solverTime, etc. per cycle (in AgentStatistics.java directly)
 
 - [x] Integrate Parameters from input to solver (timeout, weights)
 
-- [ ] Build simple rule generator
-- [ ] Build smart homes topology generator 
+- [x] Build smart homes topology generator
+    - [ ] Specialize this generator for clusters and non-clusters
+    
+- [ ] Build simple rule generator 
+    - [ ] Test
+    
 
 
