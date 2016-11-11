@@ -7,28 +7,29 @@ import edu.nmsu.kernel.DCOPInstance;
 import edu.nmsu.kernel.DCOPInstanceFactory;
 import edu.nmsu.problem.Generator;
 import edu.nmsu.problem.Parameters;
+import edu.nmsu.problem.RuleGenerator;
+import edu.nmsu.problem.Topology;
+import org.json.JSONObject;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) {
-
-//        generateSHDSInstances();
-//        return;
-
+    public static void execute() {
         int timeHorizon = Parameters.getHorizon();
 
         List<Object> algParams = new ArrayList<>();
 
         int nbIterations = 5;
-        long solverTimeoutMs = 10000;
+        long solverTimeoutMs = 5000;
         double wCost = 1;
         double wPower = 1;
 
-        DCOPInstance dcopInstance = DCOPInstanceFactory.importDCOPInstance("resources/instance.json");
+        DCOPInstance dcopInstance = DCOPInstanceFactory.importDCOPInstance("resources/instance_1.json");
         Spawner spawner = new Spawner(dcopInstance);
 
         algParams.add(nbIterations);
@@ -42,10 +43,30 @@ public class Main {
         System.out.println(getSummary(spawner.getSpawnedAgents()));
     }
 
+    public static void main(String[] args) {
+        generateSHDSInstances();
+        execute();
+        return;
+
+    }
+
 
     public static void generateSHDSInstances() {
-        Generator gen = new Generator(10, 500, 250);
-        gen.topologyGenerator();
+        Topology topo = new Topology(10, 500, 250);
+        RuleGenerator ruleGen = new RuleGenerator();
+        Generator gen = new Generator(topo, ruleGen, 8);
+
+        JSONObject exp = gen.generate();
+
+        try {
+            FileWriter file = new FileWriter("resources/instance_1.json");
+            file.write(exp.toString(2));
+            file.flush();
+            file.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static String getUsage() {
@@ -58,7 +79,7 @@ public class Main {
     }
 
     public static String getSummary(Collection<DCOPagent> agents) {
-        String res = "time\tIterAgtMsgs\tnAgtMsgs\tNetLoad\tGain\tCost";
+        String res = "time\tIterAgtMsgs\tnAgtMsgs\tNetLoad\tGain\tCost\n";
         int maxIter = DCOPinfo.leaderAgent.getAgentStatistics().size();
         long maxTime = 0; int nMsgs = 0; int netLoad = 0;
 

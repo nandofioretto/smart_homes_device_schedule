@@ -382,7 +382,7 @@ public class RuleSchedulerSolver extends CPSolver {
         for (int i = 0; i < HORIZON; i++) neighborPower[i] = 0;
         model(neighborPower);
 
-        if (super.searchWithRestarts(1000)) {
+        if (super.searchSatisfaction()) { //if (super.searchWithRestarts(1000)) {
             if (debug.schedule())
                 printPredictiveModels();
             return constructSchedule();
@@ -640,7 +640,7 @@ public class RuleSchedulerSolver extends CPSolver {
 
         // TODO: Check Time start, time end (closed or opened set)
         // Todo: Check - rule can never start from time 0
-        for (int t = rule.getTimeStart(); t <= rule.getTimeEnd(); t++) {
+        for (int t = rule.getTimeStart() ; t < rule.getTimeEnd(); t++) {
             int cpGoalState = scaleAndRoundDelta(rule.getGoalState());
             switch (rule.getRelation()) {
                 case eq:

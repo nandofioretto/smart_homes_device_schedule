@@ -1,6 +1,6 @@
 package edu.nmsu.problem;
 
-import org.json.JSONObject;
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -17,8 +17,49 @@ public class RuleGenerator {
     public RuleGenerator() {
     }
 
-    public JSONObject rule() {
-        return null;
+    public JSONArray generateRules(int nDevices) {
+        JSONArray jArray = new JSONArray();
+        int cycle = 0;
+
+        int rId = 1;
+        while(rId <= nDevices)
+        {
+            for (String rule : generateLaundryWashRules(cycle))
+                jArray.put(rule);
+            rId++; if (rId > nDevices) break;
+
+            for (String rule : generateLaundryDryRules(cycle))
+                jArray.put(rule);
+            rId++; if (rId > nDevices) break;
+
+            for (String rule : generateDishWashRules(cycle))
+                jArray.put(rule);
+            rId++; if (rId > nDevices) break;
+
+            for (String rule : generateBakeRules(cycle))
+                jArray.put(rule);
+            rId++; if (rId > nDevices) break;
+
+            for (String rule : generateWaterTempRules(cycle))
+                jArray.put(rule);
+            rId++; if (rId > nDevices) break;
+
+            for (String rule : generateEVRules(cycle))
+                jArray.put(rule);
+            rId++; if (rId > nDevices) break;
+
+            for (String rule : generateTempHeatRules(cycle))
+                jArray.put(rule);
+            rId++; if (rId > nDevices) break;
+
+            for (String rule : generateCleanlinessRules(cycle))
+                jArray.put(rule);
+            rId++; if (rId > nDevices) break;
+            
+            cycle++;
+        }
+
+        return jArray;
     }
 
     private ArrayList<String> generateLaundryWashRules(int i) {
@@ -29,9 +70,9 @@ public class RuleGenerator {
         int state = Utilities.genRand(1, 2);
         int time = Utilities.genRand(state+1, horizon);
 
-        rules.add("1\t" + device + "\t" + property + "\teq\t" + state + "\tbefore\t" + time);
-        rules.add("0\t" + device + "\t" + property + "\tgeq\t0");
-        rules.add("0\t" + device + "\t" + property + "\tleq\t" + state);
+        rules.add("1 " + device + " " + property + " eq " + state + " before " + time);
+        rules.add("0 " + device + " " + property + " geq 0");
+        rules.add("0 " + device + " " + property + " leq " + state);
         return rules;
     }
 
@@ -43,9 +84,9 @@ public class RuleGenerator {
         int state = Utilities.genRand(2, 3);
         int time = Utilities.genRand(state+1, horizon);
 
-        rules.add("1\t" + device + "\t" + property + "\teq\t" + state + "\tbefore\t" + time);
-        rules.add("0\t" + device + "\t" + property + "\tgeq\t0");
-        rules.add("0\t" + device + "\t" + property + "\tleq\t" + state);
+        rules.add("1 " + device + " " + property + " eq " + state + " before " + time);
+        rules.add("0 " + device + " " + property + " geq 0");
+        rules.add("0 " + device + " " + property + " leq " + state);
         return rules;
     }
 
@@ -65,9 +106,9 @@ public class RuleGenerator {
             time = Utilities.genRand(1, horizon - state-2);
         }
 
-        rules.add("1\t" + device + "\t" + property + "\teq\t" + state + "\t" + timePred + "\t" + time);
-        rules.add("0\t" + device + "\t" + property + "\tgeq\t0");
-        rules.add("0\t" + device + "\t" + property + "\tleq\t" + state);
+        rules.add("1 " + device + " " + property + " eq " + state + " " + timePred + " " + time);
+        rules.add("0 " + device + " " + property + " geq 0");
+        rules.add("0 " + device + " " + property + " leq " + state);
         return rules;
     }
 
@@ -81,9 +122,9 @@ public class RuleGenerator {
         int state = Utilities.genRand(1, 3);
         int time  = Utilities.genRand(state + 3, horizon - 3);
 
-        rules.add("1\t" + device + "\t" + property + "\teq\t" + state + "\t" + timePred + "\t" + time);
-        rules.add("0\t" + device + "\t" + property + "\tgeq\t0");
-        rules.add("0\t" + device + "\t" + property + "\tleq\t" + state);
+        rules.add("1 " + device + " " + property + " eq " + state + " " + timePred + " " + time);
+        rules.add("0 " + device + " " + property + " geq 0");
+        rules.add("0 " + device + " " + property + " leq " + state);
         return rules;
     }
 
@@ -99,11 +140,11 @@ public class RuleGenerator {
         int time1  = Utilities.genRand(1, horizon - 6);
         int time2  = Utilities.genRand(time1 + 3, horizon);
 
-        rules.add("1\t" + device + "\t" + property + "\tgeq\t" + state1 + "\t" + timePred + "\t" + time1 + "\t" + time2);
-        rules.add("1\t" + device + "\t" + property + "\tleq\t" + state2 + "\t" + timePred + "\t" + time1 + "\t" + time2);
+        rules.add("1 " + device + " " + property + " geq " + state1 + " " + timePred + " " + time1 + " " + time2);
+        rules.add("1 " + device + " " + property + " leq " + state2 + " " + timePred + " " + time1 + " " + time2);
 
-        rules.add("0\t" + device + "\t" + property + "\tgeq\t18");
-        rules.add("0\t" + device + "\t" + property + "\tleq\t50");
+        rules.add("0 " + device + " " + property + " geq 18");
+        rules.add("0 " + device + " " + property + " leq 50");
         return rules;
     }
 
@@ -122,9 +163,9 @@ public class RuleGenerator {
             time = Utilities.genRand(1, horizon - 5);
         }
 
-        rules.add("1\t" + device + "\t" + property + "\tgeq\t" + state + "\t" + timePred + "\t" + time);
-        rules.add("0\t" + device + "\t" + property + "\tgeq\t0");
-        rules.add("0\t" + device + "\t" + property + "\tleq\t100");
+        rules.add("1 " + device + " " + property + " geq " + state + " " + timePred + " " + time);
+        rules.add("0 " + device + " " + property + " geq 0");
+        rules.add("0 " + device + " " + property + " leq 100");
         return rules;
     }
 
@@ -135,15 +176,15 @@ public class RuleGenerator {
         String timePred = "within";
 
         int state1 = Utilities.genRand(18, 25);
-        int state2 = Utilities.genRand(state1+10, 30);
+        int state2 = Utilities.genRand(Math.min(30, state1+10),  32);
         int time1  = Utilities.genRand(1, horizon - 6);
         int time2  = Utilities.genRand(time1 + 3, horizon);
 
-        rules.add("1\t" + device + "\t" + property + "\tgeq\t" + state1 + "\t" + timePred + "\t" + time1 + "\t" + time2);
-        rules.add("1\t" + device + "\t" + property + "\tleq\t" + state2 + "\t" + timePred + "\t" + time1 + "\t" + time2);
+        rules.add("1 " + device + " " + property + " geq " + state1 + " " + timePred + " " + time1 + " " + time2);
+        rules.add("1 " + device + " " + property + " leq " + state2 + " " + timePred + " " + time1 + " " + time2);
 
-        rules.add("0\t" + device + "\t" + property + "\tgeq\t18");
-        rules.add("0\t" + device + "\t" + property + "\tleq\t50");
+        rules.add("0 " + device + " " + property + " geq 18");
+        rules.add("0 " + device + " " + property + " leq 50");
         return rules;
     }
 
@@ -156,9 +197,9 @@ public class RuleGenerator {
         int state = Utilities.genRand(50, 99);
         int time = Utilities.genRand(horizon-6, horizon);
 
-        rules.add("1\t" + device + "\t" + property + "\tgeq\t" + state + "\t" + timePred + "\t" + time);
-        rules.add("0\t" + device + "\t" + property + "\tgeq\t0");
-        rules.add("0\t" + device + "\t" + property + "\tleq\t100");
+        rules.add("1 " + device + " " + property + " geq " + state + " " + timePred + " " + time);
+        rules.add("0 " + device + " " + property + " geq 0");
+        rules.add("0 " + device + " " + property + " leq 100");
         return rules;
     }
 

@@ -39,6 +39,7 @@ public class Pair<A, B> {
         return "(" + first + ", " + second + ")";
     }
 
+
     public A getFirst() {
         return first;
     }
@@ -52,6 +53,11 @@ public class Pair<A, B> {
     }
 
     public void setSecond(B second) {
+        this.second = second;
+    }
+
+    public void set(A first, B second) {
+        this.first = first;
         this.second = second;
     }
 }

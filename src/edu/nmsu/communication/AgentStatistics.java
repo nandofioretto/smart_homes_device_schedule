@@ -55,7 +55,6 @@ public class AgentStatistics {
         schedulingTimeMsIter = new ArrayList<>();
         scheduleCostIter = new ArrayList<>();
         agentGainIter = new ArrayList<>();
-
     }
 
     public StopWatch getStopWatch() {

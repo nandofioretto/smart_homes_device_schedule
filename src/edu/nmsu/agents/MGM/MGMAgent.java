@@ -57,7 +57,10 @@ public class MGMAgent extends DCOPagent {
 
     @Override
     protected void onStart() {
+        System.out.println(getName() + " computing FIRST schedule");
+
         actions.computeFirstSchedule();
+
         // Send Gain to neighbors
         actions.computeGain();
         GainMessage gainMessage =
@@ -67,7 +70,7 @@ public class MGMAgent extends DCOPagent {
         }
 
         while (!terminationCondition()) {
-            //System.out.println("agent: " + getName() + " cycle: " + currentCycle);
+            System.out.println(getName() + " cycle" + currentCycle + " cost: " + view.getCurrentSchedule().getCost());
             MGMcycle();
 
             getAgentStatistics().updateIterationStats(view.getBestSchedule(),
@@ -80,31 +83,33 @@ public class MGMAgent extends DCOPagent {
 
     @Override
     protected void onStop() {
-        System.out.println(view.getBestSchedule().toString());
+        //System.out.println(view.getBestSchedule().toString());
     }
 
     public void MGMcycle() {
 
         while (!actions.receivedAllGains(currentCycle)) {
+            System.out.println(getName() + " waiting");
             await();
         }
 
         // Check if this agent has the best gain: if so   bestSchedule = currentSchedule;
-        if (actions.isBestGain()) {
+        if (actions.isBestGain(currentCycle)) {
             actions.updateBestSchedule(view.getCurrentSchedule());
         }
 
         // Reset gain data structure
         //actions.clearReceivedGains();
 
+        System.out.println(getName() + " computing schedule");
         // Sums the agent loads and computes the new schedule
-        if (actions.computeSchedule())
+        if (actions.computeSchedule(currentCycle))
         {
             actions.computeGain();
 
             // Send Gain message to all neighbors
             GainMessage gainMessage =
-                    new GainMessage(currentCycle, view.getGain(), view.getCurrentSchedule().getPowerConsumptionKw());
+                    new GainMessage(currentCycle+1, view.getGain(), view.getCurrentSchedule().getPowerConsumptionKw());
             for (ComAgent neighbor : this.getNeighborsRef() ) {
                 this.tell(gainMessage, neighbor);
             }

@@ -19,10 +19,19 @@
 - [x] Integrate Parameters from input to solver (timeout, weights)
 
 - [x] Build smart homes topology generator
-    - [ ] Specialize this generator for clusters and non-clusters
+    - [] Specialize this generator for clusters and non-clusters
     
-- [ ] Build simple rule generator 
-    - [ ] Test
+- [x] Build simple rule generator 
+    - [x] Test
     
+- [ ] Check statistics object / 
+- [x] Debug - it seems there is something wrong in the number of messages exchanged 
+- [ ] Flash if scheduler is infeasible
+
+- [ ] Create Instances : 3 cities | number of devices | change weights
+- [ ] Compute weights normalizing constant (for each of the 3 problems)
+- [ ] Install on NMSU servers
+
+
 
 

@@ -3,99 +3,69 @@ package edu.nmsu.problem;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Generates SHDS problems
  */
 public class Generator {
 
-    private double densityKm2;
-    private double gridSideMt;
-    private double actuatorRadiusMt;
     private final int timeHorizon = Parameters.getHorizon();
     private final double[] priceSchema = Parameters.getPriceSchema();
+    int nDevices;
 
-    Random rand = new Random();
+    RuleGenerator ruleGenerator;
+    Topology topology;
 
-    public Generator(double densityKm2, double gridSideMt, double actuatorRadiusMt) {
-        this.densityKm2 = densityKm2;
-        this.gridSideMt = gridSideMt;
-        this.actuatorRadiusMt = actuatorRadiusMt;
+    public Generator(Topology topology, RuleGenerator ruleGenerator, int nDevices) {
+        this.topology = topology;
+        this.ruleGenerator = ruleGenerator;
+        this.nDevices = nDevices;
     }
 
-    double[] generateBackgroundLoad() {
+    private double[] generateBackgroundLoad() {
         double[] bg = new double[timeHorizon];
         for (int i = 0; i < timeHorizon; i++) {
-            bg[i] = rand.nextDouble();
+            bg[i] = ThreadLocalRandom.current().nextDouble(0, 0.3);
         }
         return bg;
     }
 
     // todo: make version where all agents are constrained with all other agents
-    public void topologyGenerator() {
-
-        // number of agents
-        int numAgents = (int)((densityKm2 * gridSideMt) / 1000);
-        int numClusters = (int) Math.ceil(gridSideMt / actuatorRadiusMt);
-        int agentsPerCluster = (int) Math.ceil(numAgents / (double) numClusters);
-
-        ArrayList<ArrayList<String>> clusters = new ArrayList<>();
-        Map<String, Integer> mapToCluster = new HashMap<>();
-
-        for (int cId = 0; cId < numClusters; cId++) {
-            clusters.add(new ArrayList<String>());
-        }
-        // Save clusters of agents
-        for (int aId = 1, cId = 0; aId <= numAgents; aId++)
-        {
-            String agtName = "home_" + aId;
-            (clusters.get(cId)).add(agtName);
-            mapToCluster.put(agtName, cId);
-
-            if (aId % agentsPerCluster == 0) {
-                cId++;
-            }
-        }
+    public JSONObject generate() {
 
         // All agents within a cluster share a constraint
+        JSONObject jExperiment = new JSONObject();
 
         try {
-            JSONObject jExperiment = new JSONObject();
-            jExperiment.put("horizon", 12);
+            jExperiment.put("horizon", timeHorizon);
             jExperiment.put("priceSchema", priceSchema);
             //jExperiment.put("agents", );
 
             JSONObject jAgents = new JSONObject();
-            for (String agtName : mapToCluster.keySet()) {
+            for (String agtName : topology.getAgents()) {
                 JSONObject jAgent = new JSONObject();
 
                 // Create array of neighbors
                 JSONArray jNeighbors = new JSONArray();
-                int cId = mapToCluster.get(agtName);
-                for (String neigName : clusters.get(cId)) {
+
+                for (String neigName : topology.getNeighbors(agtName)) {
                     if (neigName.compareTo(agtName) != 0)
                         jNeighbors.put(neigName);
                 }
 
                 jAgent.put("neighbors", jNeighbors);
                 jAgent.put("backgroundLoad", generateBackgroundLoad());
-                // todo:
-                jAgent.put("rules", "TODO");
-
+                jAgent.put("rules", ruleGenerator.generateRules(nDevices));
                 jAgents.put(agtName, jAgent);
             }
             jExperiment.put("agents", jAgents);
-
-            System.out.println(jExperiment.toString(2));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        return jExperiment;
     }
 
 

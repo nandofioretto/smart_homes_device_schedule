@@ -149,7 +149,7 @@
         },
         "heat": {
           "power_consumed": 4.6,
-          "effects": [{"property": "water_temp", "delta": 11.1}]
+          "effects": [{"property": "water_temp", "delta": 8.1}]
         }
       }
     },

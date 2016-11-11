@@ -8,9 +8,6 @@ import org.jacop.core.Store;
 import org.jacop.core.Var;
 import org.jacop.search.*;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-
 /**
  * Created by nandofioretto on 11/1/16.
  */
@@ -64,14 +61,6 @@ public abstract class CPSolver implements Solver {
     public void setTimeoutMs(long timeoutMs) {
         this.timeoutMs = timeoutMs;
     }
-
-    protected PrintStream dummyStream  = new PrintStream(new OutputStream(){
-        public void write(int b) {
-            //NO-OP
-        }
-    });
-    protected PrintStream originalStream = System.out;
-
 
     /**
      * It creates an array of int variables
@@ -152,13 +141,12 @@ public abstract class CPSolver implements Solver {
     }
 
     protected boolean searchSatisfaction() {
-        System.setOut(dummyStream);
+
         SelectChoicePoint<IntVar> select =
                 new SimpleSelect<>(vars, null, new IndomainMax<>());
         search = new DepthFirstSearch<>();
         search.setTimeOut(timeoutMs / 1000);
         boolean result = search.labeling(store, select);
-        System.setOut(originalStream);
         return result;
     }
 
@@ -168,14 +156,12 @@ public abstract class CPSolver implements Solver {
      * @return true if there is a solution, false otherwise.
      */
     protected boolean searchSmallestDomain() {
-        System.setOut(dummyStream);
         SelectChoicePoint<IntVar> select =
                 new SimpleSelect<>(vars, new SmallestDomain<>(), new IndomainMin<>());
         search = new DepthFirstSearch<>();
         search.setTimeOut(timeoutMs / 1000);
 
         boolean result = search.labeling(store, select, costFunction);
-        System.setOut(originalStream);
         return result;
     }
 
@@ -215,8 +201,6 @@ public abstract class CPSolver implements Solver {
      * @return true if there is a solution, false otherwise.
      */
     protected boolean searchMostConstrainedStatic() {
-        System.setOut(dummyStream);
-
         search = new DepthFirstSearch<>();
         search.setTimeOut(timeoutMs / 1000);
 
@@ -224,7 +208,6 @@ public abstract class CPSolver implements Solver {
                 new MostConstrainedStatic<>(), new IndomainMin<>());
 
         boolean result = search.labeling(store, select, costFunction);
-        System.setOut(originalStream);
 
         return result;
     }
@@ -265,7 +248,6 @@ public abstract class CPSolver implements Solver {
      * @return true if there is a solution, false otherwise.
      */
     protected boolean searchWithRestarts(int nodesOut) {
-
         // Input Order tie breaking
         boolean result = false;
         boolean timeout = true;
@@ -274,7 +256,6 @@ public abstract class CPSolver implements Solver {
         int decisions = 0;
         int backtracks = 0;
         int wrongDecisions = 0;
-        System.setOut(dummyStream);
 
         search = new DepthFirstSearch<>();
 
@@ -314,9 +295,6 @@ public abstract class CPSolver implements Solver {
             search.setExitListener(collector);
             //System.out.println("++++++" + timeout);
         }
-        System.setOut(originalStream);
-
-
         return result;
     }
 

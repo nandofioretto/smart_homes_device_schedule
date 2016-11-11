@@ -45,6 +45,7 @@ public abstract class ComAgent extends Thread { //implements Runnable {
     private BlockingQueue<TrackableObject> mailbox;
     private final long initSleepingTimeMs = 5;
     private long sleepingTimeMs = initSleepingTimeMs;
+    private final long maxSleepingTimeMs = 1000;
     //String name;
 
     public ComAgent(String name, long agentID) {
@@ -133,7 +134,6 @@ public abstract class ComAgent extends Thread { //implements Runnable {
         sender.getAgentStatistics().getStopWatch().resume();
     }
 
-
     /**
      * Awaits while checking if the message queue is non empty. In which case, it process the message.
      */
@@ -142,7 +142,7 @@ public abstract class ComAgent extends Thread { //implements Runnable {
 
         try {
             if (mailbox.isEmpty()) {
-                sleepingTimeMs *= 2;
+                sleepingTimeMs = Math.min(sleepingTimeMs*2, maxSleepingTimeMs);
                 Thread.sleep(sleepingTimeMs);
                 // Thread.yield();
             } else {

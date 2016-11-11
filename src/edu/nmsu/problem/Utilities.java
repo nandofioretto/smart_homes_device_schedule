@@ -3,6 +3,7 @@ package edu.nmsu.problem;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -83,7 +84,7 @@ public class Utilities {
 
 
     public static double[] sum(double[] a, double[] b) {
-        //assert (a.length == b.length);
+        assert (a.length == b.length);
         for (int i=0; i<a.length; i++) {
             a[i] += b[i];
         }
@@ -91,7 +92,7 @@ public class Utilities {
     }
 
     public static double[] sum(double[] a, Double[] b) {
-        //assert (a.length == b.length);
+        assert (a.length == b.length);
         for (int i=0; i<a.length; i++) {
             a[i] += b[i];
         }
@@ -105,6 +106,11 @@ public class Utilities {
     public static String genRand(String[] array) {
         int idx = rand.nextInt(array.length);
         return array[idx];
+    }
+
+    public static String genRand(ArrayList<String> array) {
+        int idx = rand.nextInt(array.size());
+        return array.get(idx);
     }
 
     public static int genRand(int[] array) {
