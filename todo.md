@@ -23,13 +23,17 @@
     
 - [x] Build simple rule generator 
     - [x] Test
-    
-- [ ] Check statistics object / 
+
+- [ ] Generate Random 100 1-agent instance problems and solve then 
+   - modify parameters of generator untill all problems are solved  
+
+- [ ] Check statistics object (include gains and energy / current) 
 - [x] Debug - it seems there is something wrong in the number of messages exchanged 
 - [ ] Flash if scheduler is infeasible
 
 - [ ] Create Instances : 3 cities | number of devices | change weights
-- [ ] Compute weights normalizing constant (for each of the 3 problems)
+    - [ ] Compute weights normalizing constant (for each of the 3 problems)
+
 - [ ] Install on NMSU servers
 
 

@@ -359,7 +359,7 @@ public class RuleSchedulerSolver extends CPSolver {
             return constructSchedule();
         } else {  //if search fails, create a generic RulesSchedule object and set cost to max size of double.
             RulesSchedule rulesSchedule = new RulesSchedule();
-            System.out.println("Error: Schedule not found!");
+            System.err.println("Error: Schedule not found!");
 
             /*
             int nbActuators = actuatorsMap.size();

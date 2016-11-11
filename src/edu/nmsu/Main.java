@@ -24,7 +24,7 @@ public class Main {
 
         List<Object> algParams = new ArrayList<>();
 
-        int nbIterations = 5;
+        int nbIterations = 2;
         long solverTimeoutMs = 5000;
         double wCost = 1;
         double wPower = 1;
@@ -44,15 +44,17 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        generateSHDSInstances();
-        execute();
+        for (int i=0; i < 5; i++) {
+            generateSHDSInstances();
+            execute();
+        }
         return;
 
     }
 
 
     public static void generateSHDSInstances() {
-        Topology topo = new Topology(10, 500, 250);
+        Topology topo = new Topology(1, 1000, 1000);
         RuleGenerator ruleGen = new RuleGenerator();
         Generator gen = new Generator(topo, ruleGen, 8);
 
