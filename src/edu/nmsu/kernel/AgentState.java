@@ -89,7 +89,7 @@ public class AgentState {
         if (this == agentState) return;
         if (!neighbors.contains(agentState)) {
             neighbors.add(agentState);
-            System.out.println(" agent " + name + " register neighbor: " + agentState.getName());
+            //System.out.println(" agent " + name + " register neighbor: " + agentState.getName());
         }
         neighbors.sort(new AgentStateComparator());
     }

@@ -43,7 +43,7 @@ public abstract class ComAgent extends Thread { //implements Runnable {
     private ComAgent leaderRef = null;
     private AgentStatistics agentStatistics;
     private BlockingQueue<TrackableObject> mailbox;
-    private final long initSleepingTimeMs = 5;
+    private final long initSleepingTimeMs = 1;
     private long sleepingTimeMs = initSleepingTimeMs;
     private final long maxSleepingTimeMs = 1000;
     //String name;
@@ -101,8 +101,8 @@ public abstract class ComAgent extends Thread { //implements Runnable {
      */
     public void tell(Object message, ComAgent sender) {
         try {
-            String sName = sender == null ? "none" : sender.getName();
-            System.out.println(sName + " sending " + message.toString() + " to " + getName());
+//            String sName = sender == null ? "none" : sender.getName();
+//            System.out.println(sName + " sending " + message.toString() + " to " + getName());
 
             mailbox.put(new TrackableObject(message, sender));
         } catch (InterruptedException e) {
@@ -122,8 +122,8 @@ public abstract class ComAgent extends Thread { //implements Runnable {
             message.setSimulatedNanoTime(sender.getAgentStatistics().getStopWatch().getNanoTime());
         try {
 
-            String sName = sender == null ? "none" : sender.getName();
-            System.out.println(sName + " sending " + message.toString() + " to " + getName());
+//            String sName = sender == null ? "none" : sender.getName();
+//            System.out.println(sName + " sending " + message.toString() + " to " + getName());
 
             mailbox.put(new TrackableObject(message, sender));
         } catch (InterruptedException e) {
@@ -144,7 +144,7 @@ public abstract class ComAgent extends Thread { //implements Runnable {
             if (mailbox.isEmpty()) {
                 sleepingTimeMs = Math.min(sleepingTimeMs*2, maxSleepingTimeMs);
                 Thread.sleep(sleepingTimeMs);
-                // Thread.yield();
+                //Thread.yield();
             } else {
                 sleepingTimeMs = initSleepingTimeMs;
 

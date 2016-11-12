@@ -33,6 +33,7 @@ public class Topology {
         int numClusters = (int) Math.ceil(gridSideMt / actuatorRadiusMt);
         int agentsPerCluster = (int) Math.ceil(numAgents / (double) numClusters);
 
+        System.out.println("Generating " + numAgents + " AGENTS " + numClusters + " CLUSTERS " );
         for (int cId = 0; cId < numClusters; cId++) {
             clusters.add(new ArrayList<String>());
         }

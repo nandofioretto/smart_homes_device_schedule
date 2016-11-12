@@ -5,10 +5,7 @@ import edu.nmsu.communication.DCOPinfo;
 import edu.nmsu.communication.Spawner;
 import edu.nmsu.kernel.DCOPInstance;
 import edu.nmsu.kernel.DCOPInstanceFactory;
-import edu.nmsu.problem.Generator;
-import edu.nmsu.problem.Parameters;
-import edu.nmsu.problem.RuleGenerator;
-import edu.nmsu.problem.Topology;
+import edu.nmsu.problem.*;
 import org.json.JSONObject;
 
 import java.io.FileWriter;
@@ -24,9 +21,9 @@ public class Main {
 
         List<Object> algParams = new ArrayList<>();
 
-        int nbIterations = 2;
+        int nbIterations = 5;
         long solverTimeoutMs = 5000;
-        double wCost = 1;
+        double wCost = 5;
         double wPower = 1;
 
         DCOPInstance dcopInstance = DCOPInstanceFactory.importDCOPInstance("resources/instance_1.json");
@@ -44,19 +41,19 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        for (int i=0; i < 100; i++) {
-            generateSHDSInstances();
+        //for (int i=0; i < 50; i++) {
+            //generateSHDSInstances();
             execute();
-        }
+        //}
         return;
 
     }
 
 
     public static void generateSHDSInstances() {
-        Topology topo = new Topology(1, 1000, 1000);
+        Topology topo = new Topology(5, 1000, 1000);
         RuleGenerator ruleGen = new RuleGenerator();
-        Generator gen = new Generator(topo, ruleGen, 8);
+        Generator gen = new Generator(topo, ruleGen, 4);
 
         JSONObject exp = gen.generate();
 
@@ -81,31 +78,61 @@ public class Main {
     }
 
     public static String getSummary(Collection<DCOPagent> agents) {
-        String res = "time\tIterAgtMsgs\tnAgtMsgs\tNetLoad\tGain\tCost\n";
+        String res = "iterNo\t"
+                + "simTime\t"
+                + "AvgCPTime\t"
+                + "AvgMsgsSentIter\t"
+                + "NetLoad\t"
+                + "SumScheduleCost\t"
+                + "SumPriceCost\t"
+                + "AvgPriceCost\t"
+                + "energyCost\t"
+                + "avgEnergyCost\t"
+                + "vgGain\n";
+
         int maxIter = DCOPinfo.leaderAgent.getAgentStatistics().size();
-        long maxTime = 0; int nMsgs = 0; int netLoad = 0;
+        long simTime = 0; int netLoad = 0;
 
-        System.out.println(maxIter);
         for (int iter = 0; iter < maxIter; iter++) {
-            int agtMsgs = 0;
-            boolean save = true;
-
+            int iterMsgsSent = 0;
+            double sumScheduleCost = 0;
+            double sumPriceCost    = 0;
+            double sumPowerCost    = 0;
+            double avgGain         = 0;
+            double avgCPtime       = 0;
             for (DCOPagent agt : agents) {
-
                 if (iter >= agt.getAgentStatistics().size()) continue;
 
-                maxTime = Math.max(maxTime, agt.getAgentStatistics().getMilliTime(iter));
+                // time
+                simTime = Math.max(simTime, agt.getAgentStatistics().getMilliTime(iter));
+                avgCPtime += agt.getAgentStatistics().getSchedulingTimeMsIter(iter);
+
+                // msgs
                 int msgNow =  agt.getAgentStatistics().getSentMessages(iter);
                 int msgPrev = iter == 0 ? 0 : agt.getAgentStatistics().getSentMessages(iter-1);
-                nMsgs = Math.max(nMsgs, msgNow);
-                agtMsgs = Math.max(agtMsgs, (msgNow - msgPrev));
-                netLoad += (msgNow - msgPrev);
-            }
+                iterMsgsSent += (msgNow - msgPrev);
 
-            if (save) {
-                res += maxTime + "\t";
-                res += + agtMsgs + "\t" + nMsgs + "\t" + netLoad + "\n";
+                // Costs
+                // todo: check i think that cost takes into account the power consumption of neighbors -
+                sumScheduleCost += agt.getAgentStatistics().getScheduleCostIter(iter);
+                sumPriceCost    += Utilities.sum(agt.getAgentStatistics().getPriceUSDIter(iter));
+                sumPowerCost    += Utilities.sum(agt.getAgentStatistics().getPowerKWhIter(iter));
+                avgGain         += agt.getAgentStatistics().getAgentGainIter(iter);
             }
+            netLoad += iterMsgsSent;
+
+            res += iter +"\t "
+                    + simTime + "\t "
+                    + (avgCPtime/agents.size()) + "\t "
+                    + (iterMsgsSent/agents.size()) + "\t "
+                    + netLoad + "\t "
+                    + sumScheduleCost + "\t "
+                    + sumPriceCost + "\t "
+                    + (sumPriceCost/agents.size()) + "\t "
+                    + sumPowerCost + "\t "
+                    + (sumPowerCost/agents.size()) + "\t "
+                    + (avgGain/agents.size())
+                    + "\n";
         }
         return  res;
     }

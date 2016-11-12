@@ -24,9 +24,10 @@ public class MGMAgentActions extends AgentActions {
 
     CPSolver solver;
 
-    Map<Pair<Long, Integer>, MGMAgent.GainMessage> receivedGains = new HashMap<>();
+    Map<Pair<Long, Integer>, Double> receivedGains = new HashMap<>();
+    Map<Pair<Long, Integer>, Double[]> receivedEnergyProfiles = new HashMap<>();
 
-
+    // For each cycle
     private static class NullOutputStream extends OutputStream {
         @Override
         public void write(int b){
@@ -48,12 +49,6 @@ public class MGMAgentActions extends AgentActions {
 
     Pair<Long, Integer> agtIdCycle_pair = new Pair(0,0);
 
-    public MGMAgentActions(MGMAgentState agentState) {
-        super(agentState);
-        Home home = agentState.getHome();
-        assert (home != null);
-        solver = new RuleSchedulerSolver( home.getName(), home.getSchedulingRules(), agentState.getBackgroundLoads());
-    }
 
     public MGMAgentActions(MGMAgentState agentState, long solver_timout, double w_price, double w_power)
     {
@@ -64,46 +59,46 @@ public class MGMAgentActions extends AgentActions {
         solver = new RuleSchedulerSolver( home.getName(), home.getSchedulingRules(), agentState.getBackgroundLoads());
         solver.setTimeoutMs(solver_timout);
         ((RuleSchedulerSolver)solver).setWeights((int)w_price, (int)w_power);
+
     }
 
-    // If curr_schedule worst than best schedule: Gain > 0 (50 > 40 = 10)
-    // If curr_schedule best than best schedule: Gain < 0 (40 < 50 = -10)
     public void computeGain()
     {
         MGMAgentState state = (MGMAgentState)getAgentState();
-        state.setGain(state.getCurrSchedule().getCost() - state.getBestSchedule().getCost());
+        state.setGain( Math.max(0,  state.getBestSchedule().getCost() - state.getCurrSchedule().getCost()) );
     }
 
     public boolean isBestGain(int curr_cycle)
     {
-        MGMAgentState mgmAgentState = ((MGMAgentState)getAgentState());
+        MGMAgentState state = ((MGMAgentState)getAgentState());
         agtIdCycle_pair.setSecond(curr_cycle);
 
-        double gain = mgmAgentState.getGain();
-        for (AgentState n : mgmAgentState.getNeighbors()) {
+        double gain = state.getGain();
+
+        for (AgentState n : state.getNeighbors())
+        {
             agtIdCycle_pair.setFirst(n.getID());
-            if ( gain > receivedGains.get(agtIdCycle_pair).getGain() ) {
+            double neighborGain = receivedGains.get(agtIdCycle_pair);
+
+            if ( gain < neighborGain) {
+                return false;
+            } else if (gain == neighborGain && state.getID() > n.getID()) {
                 return false;
             }
         }
         return true;
     }
 
-    public void clearReceivedGains() {
-        receivedGains.clear();
-    }
-
     public void updateBestSchedule(RulesSchedule schedule)
     {
         MGMAgentState mgmAgentState = ((MGMAgentState)getAgentState());
         mgmAgentState.setBestSchedule(schedule);
-        mgmAgentState.setCurrSchedule(null);
     }
 
-    public boolean computeSchedule(int curr_cycle)
+    public boolean computeSchedule(int cycleNo)
     {
         MGMAgentState mgmAgentState = ((MGMAgentState)getAgentState());
-        agtIdCycle_pair.setSecond(curr_cycle);
+        agtIdCycle_pair.setSecond(cycleNo);
 
         long T1, T2;
         T1 = System.currentTimeMillis();
@@ -115,7 +110,7 @@ public class MGMAgentActions extends AgentActions {
         for (AgentState n : mgmAgentState.getNeighbors()) {
             agtIdCycle_pair.setFirst(n.getID());
 
-            Double[] nLoads = receivedGains.get(agtIdCycle_pair).getEnergyProfile();
+            Double[] nLoads = receivedEnergyProfiles.get(agtIdCycle_pair);
             neighborLoads = Utilities.sum(neighborLoads, nLoads);
         }
 
@@ -149,9 +144,9 @@ public class MGMAgentActions extends AgentActions {
         return (rs.getCost() != Double.MAX_VALUE);
     }
 
-    public boolean computeBaselineSchedule(int curr_cycle) {
+    public boolean computeBaselineSchedule(int cycleNo) {
         MGMAgentState mgmAgentState = ((MGMAgentState)getAgentState());
-        agtIdCycle_pair.setSecond(curr_cycle);
+        agtIdCycle_pair.setSecond(cycleNo);
 
         long T1, T2;
         T1 = System.currentTimeMillis();
@@ -163,7 +158,7 @@ public class MGMAgentActions extends AgentActions {
         for (AgentState n : mgmAgentState.getNeighbors()) {
             agtIdCycle_pair.setFirst(n.getID());
 
-            Double[] nLoads = receivedGains.get(n.getID()).getEnergyProfile();
+            Double[] nLoads = receivedEnergyProfiles.get(n.getID());
             neighborLoads = Utilities.sum(neighborLoads, nLoads);
         }
 
@@ -178,17 +173,23 @@ public class MGMAgentActions extends AgentActions {
         return (rs.getCost() != Double.MAX_VALUE);
     }
 
-    public void storeMessage(long id, int curr_cycle, MGMAgent.GainMessage msg)
+    public void storeMessage(long id, MGMAgent.GainMessage msg)
     {
-        Pair p = new Pair(id, curr_cycle);
-        if (curr_cycle == msg.getCycle())
-            receivedGains.put(p, msg);
+        Pair p = new Pair(id, msg.getCycle());
+        receivedGains.put(p, msg.getGain());
+    }
+
+    public void storeMessage(long id, MGMAgent.EnergyProfileMessage msg)
+    {
+        Pair p = new Pair(id, msg.getCycle());
+        receivedEnergyProfiles.put(p, msg.getEnergyProfile());
     }
 
 
-    public boolean receivedAllGains(int curr_cycle) {
+    /** Check if the agent received gains from all neighbors at iteration \p iter */
+    public boolean receivedAllGains(int iter) {
         MGMAgentState mgmAgentState = ((MGMAgentState)getAgentState());
-        agtIdCycle_pair.setSecond(curr_cycle);
+        agtIdCycle_pair.setSecond(iter);
 
         for (AgentState n : mgmAgentState.getNeighbors()) {
             agtIdCycle_pair.setFirst(n.getID());
@@ -197,6 +198,20 @@ public class MGMAgentActions extends AgentActions {
         }
         return true;
     }
+
+    /** Check if the agent received energey profiles from all neighbors at iteration \p iter */
+    public boolean receivedAllEnergyProfiles(int iter) {
+        MGMAgentState mgmAgentState = ((MGMAgentState)getAgentState());
+        agtIdCycle_pair.setSecond(iter);
+
+        for (AgentState n : mgmAgentState.getNeighbors()) {
+            agtIdCycle_pair.setFirst(n.getID());
+            if (!receivedEnergyProfiles.containsKey(agtIdCycle_pair))
+                return false;
+        }
+        return true;
+    }
+
 
 
 }

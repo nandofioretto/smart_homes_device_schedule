@@ -19,17 +19,19 @@
 - [x] Integrate Parameters from input to solver (timeout, weights)
 
 - [x] Build smart homes topology generator
-    - [] Specialize this generator for clusters and non-clusters
+    - [x] Specialize this generator for clusters and non-clusters
     
 - [x] Build simple rule generator 
     - [x] Test
 
-- [ ] Generate Random 100 1-agent instance problems and solve then 
+- [x] Generate Random 100 1-agent instance problems and solve then 
    - modify parameters of generator untill all problems are solved  
 
-- [ ] Check statistics object (include gains and energy / current) 
+- [x] Check statistics object (include gains and energy / current)
+- [x] Check new algorithm
+
 - [x] Debug - it seems there is something wrong in the number of messages exchanged 
-- [ ] Flash if scheduler is infeasible
+- [x] Flash if scheduler is infeasible
 
 - [ ] Create Instances : 3 cities | number of devices | change weights
     - [ ] Compute weights normalizing constant (for each of the 3 problems)

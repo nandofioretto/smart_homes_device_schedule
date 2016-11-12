@@ -31,7 +31,7 @@ public class RulesSchedule  {
         int timesteps = Parameters.getHorizon();
         powerConsumptionKw = new Double[timesteps];
         pricePerTimeStep   = new Double[timesteps];
-        cost = 0;
+        cost = Double.MAX_VALUE;
     }
 
     public RulesSchedule(Object obj) {

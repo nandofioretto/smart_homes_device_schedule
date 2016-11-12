@@ -99,6 +99,20 @@ public class Utilities {
         return a;
     }
 
+    public static double sum(Double[] array) {
+        double sum = 0;
+        for (int i = 0; i < array.length; i++)
+            sum += array[i];
+        return sum;
+    }
+
+    public static double sum(double[] array) {
+        double sum = 0;
+        for (int i = 0; i < array.length; i++)
+            sum += array[i];
+        return sum;
+    }
+
     public static int genRand(int a, int b) {
         return rand.nextInt(b - a + 1) + a;
     }

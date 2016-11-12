@@ -116,6 +116,26 @@ public class AgentStatistics {
 
     public void resetSentMessages() {sentMessages = 0;}
 
+    public Double[] getPriceUSDIter(int iter) {
+        return priceUSDIter.get(iter);
+    }
+
+    public Double[] getPowerKWhIter(int iter) {
+        return powerKWhIter.get(iter);
+    }
+
+    public long getSchedulingTimeMsIter(int iter) {
+        return schedulingTimeMsIter.get(iter);
+    }
+
+    public double getScheduleCostIter(int iter) {
+        return scheduleCostIter.get(iter);
+    }
+
+    public double getAgentGainIter(int iter) {
+        return agentGainIter.get(iter);
+    }
+
     @Override
     public String toString() {
         return  "simulated Time: " + stopWatch.getMilliTime() + " ms " +

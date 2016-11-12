@@ -241,7 +241,6 @@ public class RuleSchedulerSolver extends CPSolver {
         store = new Store();
         vars = new IntVar[NUM_ACTUATORS * HORIZON];
 
-
         ////////////////////////////////
         // Variables
         ////////////////////////////////
@@ -314,14 +313,6 @@ public class RuleSchedulerSolver extends CPSolver {
         // 2. Total power price
         createObjectivePrice(objPrice, var_aggrPower, powerPriceKWh);
 
-
-        // normalize:
-//        System.out.println("max power: " + objPowerDiff.max() + "  max price: " + objPrice.max());
-//        if (objPowerDiff.max() > objPrice.max()) {
-//            alphaPrice = Math.max(1, objPowerDiff.max()/objPrice.max());
-//        } else {
-//            alphaPower = Math.max(1, objPrice.max()/objPowerDiff.max());
-//        }
         if (debug.objPower()) {
             System.out.println("========================\nobjPowerDiff: " + objPowerDiff.max()
                     + "\nobjPrice: " + objPrice.max() + "\n=======================");
@@ -333,7 +324,6 @@ public class RuleSchedulerSolver extends CPSolver {
                 new IntVar[]{objPowerDiff,objPrice,costFunction},
                 new int[]{alphaPower,alphaPrice,-1}, "==", 0);
         store.impose(ctr);
-//        costFunction = objPrice;
 
         ////////////////////////////////////////////
         // Search
@@ -382,7 +372,8 @@ public class RuleSchedulerSolver extends CPSolver {
         for (int i = 0; i < HORIZON; i++) neighborPower[i] = 0;
         model(neighborPower);
 
-        if (super.searchSatisfaction()) { //if (super.searchWithRestarts(1000)) {
+        if (super.searchSatisfaction()) { //
+        //if (super.searchWithRestarts(1000)) {
             if (debug.schedule())
                 printPredictiveModels();
             return constructSchedule();
@@ -453,12 +444,18 @@ public class RuleSchedulerSolver extends CPSolver {
         }
 
         // Store power result in the rulesScheduler.
+        double powerCost = 0;
+        double priceCost = 0;
         for (int t = 0; t < HORIZON; t++) {
             double power = var_aggrPower[t].value() / (double)getKiloWattToWatt();
             rulesSchedule.setPowerConsumptionKw(t, power);
+            powerCost += power * power;
+            priceCost += power * powerPriceKWh[t];
         }
+
         // Set cost of this schedule
-        rulesSchedule.setCost((double)costFunction.value()/scaleFactor);
+        //rulesSchedule.setCost((double)costFunction.value()/scaleFactor);
+        rulesSchedule.setCost(powerCost + priceCost);
 
         return rulesSchedule;
     }

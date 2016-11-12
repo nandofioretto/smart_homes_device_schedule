@@ -4,6 +4,7 @@ import edu.nmsu.communication.BasicMessage;
 import edu.nmsu.communication.ComAgent;
 import edu.nmsu.communication.DCOPagent;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -43,12 +44,17 @@ public class MGMAgent extends DCOPagent {
     protected void onReceive(Object message, ComAgent sender) {
         super.onReceive(message, sender);
 
-        if (message instanceof GainMessage) {
+        if (message instanceof GainMessage)
+        {
             GainMessage msg = (GainMessage) message;
-            actions.storeMessage(sender.getId(), currentCycle, msg);
+            actions.storeMessage(sender.getId(), msg);
+        }
+        else if (message instanceof EnergyProfileMessage)
+        {
+            EnergyProfileMessage msg = (EnergyProfileMessage) message;
+            actions.storeMessage(sender.getId(), msg);
         }
     }
-
 
     @Override
     protected boolean terminationCondition() {
@@ -57,27 +63,41 @@ public class MGMAgent extends DCOPagent {
 
     @Override
     protected void onStart() {
-        System.out.println(getName() + " computing FIRST schedule");
-
+        // Compute first Schedule
         actions.computeFirstSchedule();
+        getAgentStatistics().updateIterationStats(view.getCurrentSchedule(), view.getSolvingTimeMs(), view.getGain());
 
-        // Send Gain to neighbors
-        actions.computeGain();
-        GainMessage gainMessage =
-                new GainMessage(currentCycle, view.getGain(), view.getCurrentSchedule().getPowerConsumptionKw());
+        // Send Energy Profile
+        EnergyProfileMessage message =
+                new EnergyProfileMessage(currentCycle, view.getCurrentSchedule().getPowerConsumptionKw());
         for (ComAgent neighbor : this.getNeighborsRef() ) {
-            this.tell(gainMessage, neighbor);
+            neighbor.tell(message, getSelf());
         }
 
+        // Wait to receive En Profiles
+        while (!actions.receivedAllEnergyProfiles(currentCycle)) {
+            await();
+        }
+
+        // Compute current Schedule (and update best one)
+        if (actions.computeSchedule(currentCycle)) {
+            actions.updateBestSchedule(view.getCurrentSchedule());
+        } else {
+            System.err.println("Error: Schedule not found!");
+        }
+
+        getAgentStatistics().updateIterationStats(view.getBestSchedule(), view.getSolvingTimeMs(), view.getGain());
+
+
         while (!terminationCondition()) {
-            System.out.println(getName() + " cycle" + currentCycle + " cost: " + view.getCurrentSchedule().getCost());
-            MGMcycle();
-
-            getAgentStatistics().updateIterationStats(view.getBestSchedule(),
-                    view.getSolvingTimeMs(),
-                    view.getGain());
-
             currentCycle++;
+//            try {
+//                Thread.sleep(100);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+            MGMcycle();
+            getAgentStatistics().updateIterationStats(view.getBestSchedule(), view.getSolvingTimeMs(), view.getGain());
         }
     }
 
@@ -88,35 +108,46 @@ public class MGMAgent extends DCOPagent {
 
     public void MGMcycle() {
 
-        while (!actions.receivedAllGains(currentCycle)) {
-            System.out.println(getName() + " waiting");
+        // Send Energy Profile of the Best schedule
+        EnergyProfileMessage enMessage =
+            new EnergyProfileMessage(currentCycle, view.getBestSchedule().getPowerConsumptionKw());
+        for (ComAgent neighbor : this.getNeighborsRef() ) {
+            neighbor.tell(enMessage, getSelf());
+        }
+
+        // Wait to receive En Profiles
+        while (!actions.receivedAllEnergyProfiles(currentCycle)) {
             await();
         }
 
-        // Check if this agent has the best gain: if so   bestSchedule = currentSchedule;
-        if (actions.isBestGain(currentCycle)) {
-            actions.updateBestSchedule(view.getCurrentSchedule());
-        }
+        // Compute current Schedule (and update best one)
+        if (actions.computeSchedule(currentCycle)) {
 
-        // Reset gain data structure
-        //actions.clearReceivedGains();
-
-        System.out.println(getName() + " computing schedule");
-        // Sums the agent loads and computes the new schedule
-        if (actions.computeSchedule(currentCycle))
-        {
             actions.computeGain();
 
             // Send Gain message to all neighbors
-            GainMessage gainMessage =
-                    new GainMessage(currentCycle+1, view.getGain(), view.getCurrentSchedule().getPowerConsumptionKw());
+            GainMessage gainMessage = new GainMessage(currentCycle, view.getGain());
             for (ComAgent neighbor : this.getNeighborsRef() ) {
-                this.tell(gainMessage, neighbor);
+                neighbor.tell(gainMessage, getSelf());
             }
 
-        }
-    }
+            // Wait to receive Gains
+            while (!actions.receivedAllGains(currentCycle)) {
+                await();
+            }
 
+            // todo: Check if all gains = 0 --> converged
+
+            // Check if this agent has the best gain: if so   bestSchedule = currentSchedule;
+            if (actions.isBestGain(currentCycle)) {
+                actions.updateBestSchedule(view.getCurrentSchedule());
+            }
+
+        } else {
+            System.err.println("Error: Schedule not found!");
+        }
+
+    }
 
     /////////////////////////////////////////////////////////////////////////
     // Messages
@@ -124,12 +155,10 @@ public class MGMAgent extends DCOPagent {
     public static class GainMessage extends BasicMessage {
         private final int cycle;
         private final double gain;
-        private final Double[] energyProfile;
 
-        public GainMessage(int cycle, double gain, Double[] energyProfile) {
+        public GainMessage(int cycle, double gain) {
             this.cycle = cycle;
             this.gain = gain;
-            this.energyProfile = energyProfile;
         }
 
         public int getCycle() {
@@ -140,13 +169,32 @@ public class MGMAgent extends DCOPagent {
             return gain;
         }
 
+        @Override
+        public String toString() {
+            return "MGM::GainMessage (" + cycle + "): " + gain;
+        }
+    }
+
+    public static class EnergyProfileMessage extends BasicMessage {
+        private final int cycle;
+        private final Double[] energyProfile;
+
+        public EnergyProfileMessage(int cycle, Double[] energyProfile) {
+            this.cycle = cycle;
+            this.energyProfile = energyProfile.clone();
+        }
+
+        public int getCycle() {
+            return cycle;
+        }
+
         public Double[] getEnergyProfile() {
             return energyProfile;
         }
 
         @Override
         public String toString() {
-            return "MGM::GainMessage";
+            return "MGM::EnergyProfileMessage (" + cycle + ")" + Arrays.toString(energyProfile);
         }
     }
 

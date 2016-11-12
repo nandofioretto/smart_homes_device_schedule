@@ -34,7 +34,7 @@ public abstract class CPSolver implements Solver {
 
     /** It specifies the scale factors to round double numbers to integers. */
     protected final int kiloWattToWatt = 10;   // used for power
-    protected final int centsToDollars = 10;   // used for price
+    protected final int centsToDollars = 100;   // used for price
     protected final int deltaScale     = 10;   // used for deltas
     protected  double scaleFactor = kiloWattToWatt*centsToDollars;
 

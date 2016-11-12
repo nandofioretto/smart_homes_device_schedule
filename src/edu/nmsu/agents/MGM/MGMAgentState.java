@@ -18,7 +18,7 @@ public class MGMAgentState extends AgentState {
     private RulesSchedule bestSchedule = new RulesSchedule();
     private RulesSchedule currSchedule = new RulesSchedule();
     private long solvingTimeMs = 0;     // time spend by the scheduler in current iteration
-    private double gain = Double.MAX_VALUE;
+    private double gain = -1;
 
     public MGMAgentState(String name, long ID, Home pHome, double[] bgLoads) {
         super(name, ID);
