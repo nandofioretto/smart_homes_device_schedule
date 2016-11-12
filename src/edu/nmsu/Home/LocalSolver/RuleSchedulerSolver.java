@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 public class RuleSchedulerSolver extends CPSolver {
 
     // Class Parameters
-//    private ArrayList<SchedulingRule> passiveRules;
-//    private ArrayList<SchedulingRule> activeRules;
+    //    private ArrayList<SchedulingRule> passiveRules;
+    //    private ArrayList<SchedulingRule> activeRules;
     private ArrayList<SchedulingRule> rules;
 
     private Map<PredictiveModel, Integer> cpModelId;
