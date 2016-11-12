@@ -67,7 +67,7 @@ public class MGMAgent extends DCOPagent {
         // Compute first Schedule
         if (!actions.computeFirstSchedule()) {
             System.err.println(getName() + " Failed computing first schedule");
-//            System.exit(-1);
+            System.exit(-1);
         }
         getAgentStatistics().updateIterationStats(view.getCurrentSchedule(), view.getSolvingTimeMs(), view.getGain());
 

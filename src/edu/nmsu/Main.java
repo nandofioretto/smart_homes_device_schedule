@@ -42,7 +42,7 @@ public class Main {
     public static void main(String[] args) {
         for (int i=0; i < 1; i++) {
             String file = "resources/inputs/1cluster/instance_DM_"+i+".json";
-            //generateSHDSInstances(file, 1);
+            generateSHDSInstances(file, 5);
             execute(file);
         }
         return;
@@ -50,7 +50,7 @@ public class Main {
 
 
     public static void generateSHDSInstances(String fileName, int nDevices) {
-        Topology topo = new Topology(500, 100, 100);
+        Topology topo = new Topology(100, 100, 100);
         //Topology topo = new Topology(718, 100, 100);
         //Topology topo = new Topology(3766, 100, 100);
         RuleGenerator ruleGen = new RuleGenerator();

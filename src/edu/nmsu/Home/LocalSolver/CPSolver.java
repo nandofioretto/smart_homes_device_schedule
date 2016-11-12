@@ -145,7 +145,7 @@ public abstract class CPSolver implements Solver {
         SelectChoicePoint<IntVar> select =
                 new SimpleSelect<>(vars, null, new IndomainMax<>());
         search = new DepthFirstSearch<>();
-        search.setTimeOut(timeoutMs / 1000);
+        //search.setTimeOut(timeoutMs / 1000);
         boolean result = search.labeling(store, select);
         return result;
     }
