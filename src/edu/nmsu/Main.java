@@ -10,23 +10,22 @@ import org.json.JSONObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class Main {
 
-    public static void execute() {
-        int timeHorizon = Parameters.getHorizon();
-
+    public static void execute(String file) {
         List<Object> algParams = new ArrayList<>();
 
-        int nbIterations = 5;
-        long solverTimeoutMs = 5000;
-        double wCost = 5;
+        int nbIterations = 1;
+        long solverTimeoutMs = 10000;
+        double wCost = 1;
         double wPower = 1;
 
-        DCOPInstance dcopInstance = DCOPInstanceFactory.importDCOPInstance("resources/instance_1.json");
+        DCOPInstance dcopInstance = DCOPInstanceFactory.importDCOPInstance(file);
         Spawner spawner = new Spawner(dcopInstance);
 
         algParams.add(nbIterations);
@@ -41,27 +40,29 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        //for (int i=0; i < 50; i++) {
-            //generateSHDSInstances();
-            execute();
-        //}
+        for (int i=0; i < 1; i++) {
+            String file = "resources/inputs/1cluster/instance_DM_"+i+".json";
+            //generateSHDSInstances(file, 1);
+            execute(file);
+        }
         return;
-
     }
 
 
-    public static void generateSHDSInstances() {
-        Topology topo = new Topology(5, 1000, 1000);
+    public static void generateSHDSInstances(String fileName, int nDevices) {
+        Topology topo = new Topology(500, 100, 100);
+        //Topology topo = new Topology(718, 100, 100);
+        //Topology topo = new Topology(3766, 100, 100);
         RuleGenerator ruleGen = new RuleGenerator();
-        Generator gen = new Generator(topo, ruleGen, 4);
+        Generator gen = new Generator(topo, ruleGen, nDevices);
 
         JSONObject exp = gen.generate();
 
         try {
-            FileWriter file = new FileWriter("resources/instance_1.json");
-            file.write(exp.toString(2));
-            file.flush();
-            file.close();
+            FileWriter fileOut = new FileWriter(fileName);
+            fileOut.write(exp.toString(2));
+            fileOut.flush();
+            fileOut.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -88,10 +89,17 @@ public class Main {
                 + "AvgPriceCost\t"
                 + "energyCost\t"
                 + "avgEnergyCost\t"
-                + "vgGain\n";
+                + "vgGain\t";
+        for (int i = 0; i < Parameters.getHorizon(); i++)
+            res += "pw_t_" + i + ((i == Parameters.getHorizon()- 1) ? "\n" : "\t");
+
+
+        DecimalFormat df = new DecimalFormat("#.00");
 
         int maxIter = DCOPinfo.leaderAgent.getAgentStatistics().size();
         long simTime = 0; int netLoad = 0;
+
+        double[] aggrPower = new double[Parameters.getHorizon()];
 
         for (int iter = 0; iter < maxIter; iter++) {
             int iterMsgsSent = 0;
@@ -100,6 +108,9 @@ public class Main {
             double sumPowerCost    = 0;
             double avgGain         = 0;
             double avgCPtime       = 0;
+
+            for (int i = 0; i < aggrPower.length; i++) aggrPower[i] = 0;
+
             for (DCOPagent agt : agents) {
                 if (iter >= agt.getAgentStatistics().size()) continue;
 
@@ -118,23 +129,29 @@ public class Main {
                 sumPriceCost    += Utilities.sum(agt.getAgentStatistics().getPriceUSDIter(iter));
                 sumPowerCost    += Utilities.sum(agt.getAgentStatistics().getPowerKWhIter(iter));
                 avgGain         += agt.getAgentStatistics().getAgentGainIter(iter);
+
+                // Power
+                aggrPower = Utilities.sum(aggrPower, agt.getAgentStatistics().getPowerKWhIter(iter));
             }
             netLoad += iterMsgsSent;
 
             res += iter +"\t "
-                    + simTime + "\t "
-                    + (avgCPtime/agents.size()) + "\t "
-                    + (iterMsgsSent/agents.size()) + "\t "
-                    + netLoad + "\t "
-                    + sumScheduleCost + "\t "
-                    + sumPriceCost + "\t "
-                    + (sumPriceCost/agents.size()) + "\t "
-                    + sumPowerCost + "\t "
-                    + (sumPowerCost/agents.size()) + "\t "
-                    + (avgGain/agents.size())
-                    + "\n";
+                    + df.format(simTime) + "\t "
+                    + df.format(avgCPtime/agents.size()) + "\t "
+                    + df.format(iterMsgsSent/agents.size()) + "\t "
+                    + df.format(netLoad) + "\t "
+                    + df.format(sumScheduleCost) + "\t "
+                    + df.format(sumPriceCost) + "\t "
+                    + df.format(sumPriceCost/agents.size()) + "\t "
+                    + df.format(sumPowerCost) + "\t "
+                    + df.format(sumPowerCost/agents.size()) + "\t "
+                    + df.format(avgGain/agents.size()) + "\t ";
+            for (int i = 0; i < aggrPower.length; i++)
+                res += df.format(aggrPower[i]) + ((i == aggrPower.length - 1) ? "\n" : "\t");
         }
         return  res;
     }
+
+
 
 }

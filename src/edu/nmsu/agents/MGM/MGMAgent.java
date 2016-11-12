@@ -62,9 +62,13 @@ public class MGMAgent extends DCOPagent {
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         // Compute first Schedule
-        actions.computeFirstSchedule();
+        if (!actions.computeFirstSchedule()) {
+            System.err.println(getName() + " Failed computing first schedule");
+//            System.exit(-1);
+        }
         getAgentStatistics().updateIterationStats(view.getCurrentSchedule(), view.getSolvingTimeMs(), view.getGain());
 
         // Send Energy Profile
@@ -91,11 +95,11 @@ public class MGMAgent extends DCOPagent {
 
         while (!terminationCondition()) {
             currentCycle++;
-//            try {
-//                Thread.sleep(100);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             MGMcycle();
             getAgentStatistics().updateIterationStats(view.getBestSchedule(), view.getSolvingTimeMs(), view.getGain());
         }

@@ -35,6 +35,18 @@
 
 - [ ] Create Instances : 3 cities | number of devices | change weights
     - [ ] Compute weights normalizing constant (for each of the 3 problems)
+ 
+"We sample neighborhoods in three cities in the United States (Des Moines, IA;
+Boston, MA; and San Francisco, CA) and estimate the density of houses in each city. 
+The average density (in houses per square kilometers) is 718 in Des Moines, 
+1357 in Boston, and 3766 in San Francisco. 
+For each city, we created a 200m 200m grid, where the distance between intersections is 20m, 
+and randomly placed houses in this grid until the density is the same as the sampled density. 
+Finally, we greedily placed aggregators, with a communication radius of 100m, 
+in this grid until all houses are within the radius of at least one aggregator. 
+Aggregators can then communicate with all homes and aggregators within its communication radius."
+
+- [x] Statistics: Add stats for all agents
 
 - [ ] Install on NMSU servers
 
