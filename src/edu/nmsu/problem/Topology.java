@@ -13,6 +13,9 @@ public class Topology {
     private double densityKm2;
     private double gridSideMt;
     private double actuatorRadiusMt;
+    private int numAgents;
+    private int numClusters;
+    private int agentsPerCluster;
 
     ArrayList<ArrayList<String>> clusters = new ArrayList<>();
     Map<String, Integer> mapToCluster = new HashMap<>();
@@ -29,9 +32,9 @@ public class Topology {
     private void generate() {
 
         // Compute number of clusters and number of agents per cluster
-        int numAgents = (int)((densityKm2 * gridSideMt) / 1000);
-        int numClusters = (int) Math.ceil(gridSideMt / actuatorRadiusMt);
-        int agentsPerCluster = (int) Math.ceil(numAgents / (double) numClusters);
+        numAgents = (int)((densityKm2 * gridSideMt) / 1000);
+        numClusters = (int) Math.ceil(gridSideMt / actuatorRadiusMt);
+        agentsPerCluster = (int) Math.ceil(numAgents / (double) numClusters);
 
         System.out.println("Generating " + numAgents + " AGENTS " + numClusters + " CLUSTERS " );
         for (int cId = 0; cId < numClusters; cId++) {
@@ -64,12 +67,26 @@ public class Topology {
             neighbors.get(this_c).add(next_c);
             neighbors.get(next_c).add(this_c);
         }
+    }
 
-
+    public int numAgents( ) {
+        return numAgents;
     }
 
     public Set<String> getAgents() {
         return neighbors.keySet();
+    }
+
+    public int getNumAgents() {
+        return numAgents;
+    }
+
+    public int getNumClusters() {
+        return numClusters;
+    }
+
+    public int getAgentsPerCluster() {
+        return agentsPerCluster;
     }
 
     ArrayList<String> getNeighbors(String agtName) {

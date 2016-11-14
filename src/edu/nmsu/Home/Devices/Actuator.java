@@ -1,8 +1,6 @@
 package edu.nmsu.Home.Devices;
 
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Created by nandofioretto on 11/2/16.
@@ -30,6 +28,13 @@ public class Actuator extends Device {
 
     public void addAction(Action a) {
         actions.add(a);
+//        Collections.sort(actions, new Comparator<Action>() {
+//            @Override
+//            public int compare(Action o1, Action o2) {
+//                return o1.getPowerKWh().compareTo(o2.getPowerKWh());
+//            }
+//        });
+
         // order actions based on their power consumption
         actions.sort((a1, a2) -> a1.getPowerKWh().compareTo(a2.getPowerKWh()));
     }

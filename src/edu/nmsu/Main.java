@@ -41,16 +41,39 @@ public class Main {
 
     public static void main(String[] args) {
         for (int i=0; i < 1; i++) {
-            String file = "resources/inputs/1cluster/instance_DM_"+i+".json";
-            generateSHDSInstances(file, 5);
-            execute(file);
+            String file = "resources/inputs/1cluster/instance_DM_"+i;//+".json";
+//            generateSHDSInstances(file, 5);
+//            execute(file);
+            generateMultiSHDSInstances(file, 6, new int[] {10, 20, 100});
         }
         return;
     }
 
 
+    public static void generateMultiSHDSInstances(String fileName, int nDevices, int[] radious) {
+        ArrayList<Topology> topologies = new ArrayList<>();
+        for (int r : radious) {
+            topologies.add(new Topology(500, 100, r));
+        }
+        RuleGenerator ruleGen = new RuleGenerator();
+        GeneratorMulti gen = new GeneratorMulti(topologies, ruleGen, nDevices);
+
+        for (int i = 0; i < radious.length; i++) {
+            JSONObject exp = gen.generate(i);
+
+            try {
+                FileWriter fileOut = new FileWriter(fileName + "_" + radious[i] + ".json");
+                fileOut.write(exp.toString(2));
+                fileOut.flush();
+                fileOut.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public static void generateSHDSInstances(String fileName, int nDevices) {
-        Topology topo = new Topology(100, 100, 100);
+        Topology topo = new Topology(500, 100, 100);
         //Topology topo = new Topology(718, 100, 100);
         //Topology topo = new Topology(3766, 100, 100);
         RuleGenerator ruleGen = new RuleGenerator();

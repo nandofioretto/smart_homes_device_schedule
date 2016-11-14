@@ -3,23 +3,33 @@ package edu.nmsu.problem;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Generates SHDS problems
  */
-public class Generator {
+public class GeneratorMulti {
 
     private final int timeHorizon = Parameters.getHorizon();
     private final double[] priceSchema = Parameters.getPriceSchema();
     int nDevices;
 
-    RuleGenerator ruleGenerator;
-    Topology topology;
+    Map<String, JSONArray> agentRules;
+    ArrayList<Topology> topologies;
 
-    public Generator(Topology topology, RuleGenerator ruleGenerator, int nDevices) {
-        this.topology = topology;
-        this.ruleGenerator = ruleGenerator;
+    public GeneratorMulti(ArrayList<Topology> topologies, RuleGenerator ruleGenerator, int nDevices) {
+        this.topologies = topologies;
+        agentRules = new HashMap<>();
+        for (Topology t : topologies) {
+            for (String agtName : t.getAgents()) {
+                if (!agentRules.containsKey(agtName))
+                    agentRules.put(agtName, ruleGenerator.generateRules(nDevices));
+            }
+        }
+        this.topologies = topologies;
         this.nDevices = nDevices;
     }
 
@@ -33,8 +43,9 @@ public class Generator {
     }
 
     // todo: make version where all agents are constrained with all other agents
-    public JSONObject generate() {
+    public JSONObject generate(int i) {
 
+        Topology topology = topologies.get(i);
         // All agents within a cluster share a constraint
         JSONObject jExperiment = new JSONObject();
 
@@ -57,7 +68,7 @@ public class Generator {
 
                 jAgent.put("neighbors", jNeighbors);
                 jAgent.put("backgroundLoad", generateBackgroundLoad());
-                jAgent.put("rules", ruleGenerator.generateRules(nDevices));
+                jAgent.put("rules", agentRules.get(agtName));
                 jAgents.put(agtName, jAgent);
             }
             jExperiment.put("agents", jAgents);
