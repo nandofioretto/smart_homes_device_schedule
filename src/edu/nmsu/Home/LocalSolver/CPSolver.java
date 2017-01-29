@@ -6,6 +6,7 @@ import org.jacop.constraints.XltC;
 import org.jacop.core.IntVar;
 import org.jacop.core.Store;
 import org.jacop.core.Var;
+import org.jacop.floats.core.FloatVar;
 import org.jacop.search.*;
 
 /**
@@ -87,6 +88,11 @@ public abstract class CPSolver implements Solver {
             array[i] = new IntVar(store, name + "_[" + i + "]", min, max);
     }
 
+    protected void createFloatVarArray(FloatVar[] array, Store store, String name, double min, double max) {
+        for (int i = 0; i < array.length; i++)
+            array[i] = new FloatVar(store, name + "_[" + i + "]", min, max);
+    }
+
     /**
      * It creates a 2D array of int variables
      * @param array The array of variables
@@ -98,6 +104,14 @@ public abstract class CPSolver implements Solver {
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array[i].length; j++) {
                 array[i][j] = new IntVar(store, min, max);
+            }
+        }
+    }
+
+    protected void createFloatVar2DArray(FloatVar[][] array, Store store, float min, float max) {
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[i].length; j++) {
+                array[i][j] = new FloatVar(store, min, max);
             }
         }
     }
@@ -114,6 +128,14 @@ public abstract class CPSolver implements Solver {
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array[i].length; j++) {
                 array[i][j] = new IntVar(store, name + "_[" + i + "," + j + "]", min, max);
+            }
+        }
+    }
+
+    protected void createFloatVar2DArray(FloatVar[][] array, Store store, String name, double min, double max) {
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[i].length; j++) {
+                array[i][j] = new FloatVar(store, name + "_[" + i + "," + j + "]", min, max);
             }
         }
     }
