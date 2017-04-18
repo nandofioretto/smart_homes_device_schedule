@@ -1,6 +1,6 @@
 # SHDS-simulator
 
-This repository contains the sources of the SH-MGM algorithm and of the DCOP simulator used in Section 5.2 of [ref. 1].
+This repository contains the sources of the SH-MGM algorithm and of the DCOP simulator used in Section 5.2 of [1].
 
 
 ## References
