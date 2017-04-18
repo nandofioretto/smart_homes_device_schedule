@@ -73,7 +73,7 @@ public class Main {
     }
 
     public static void generateSHDSInstances(String fileName, int nDevices) {
-        Topology topo = new Topology(90, 100, 1000);
+        Topology topo = new Topology(70, 100, 1000);
         //Topology topo = new Topology(718, 100, 100);
         //Topology topo = new Topology(3766, 100, 100);
         RuleGenerator ruleGen = new RuleGenerator();
