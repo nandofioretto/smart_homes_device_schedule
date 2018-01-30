@@ -24,5 +24,5 @@ This repository contains the sources of the SH-MGM algorithm and of the DCOP sim
 
 ## Contacts
 - Ferdinando Fioretto: fioretto@umich.edu
-- William Yeoh: wyeoh@cs.nmsu.edu
+- William Yeoh: wyeoh@cs.wustl.edu
 - Enrico Pontelli: epontell@cs.nmsu.edu
