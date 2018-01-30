@@ -1,4 +1,4 @@
-# SHDS-AAMAS17
+# A Multiagent System Approach to Scheduling Devices in Smart Homes
 
 This repository contains the sources of the SH-MGM algorithm and of the DCOP simulator used in Section 5.2 of [1].
 
