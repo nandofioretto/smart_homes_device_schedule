@@ -18,6 +18,10 @@ This repository contains the sources of the SH-MGM algorithm and of the DCOP sim
 }
 ```
 
+## Sponsors
+- NSF grant 1550662 [CAREER: Decentralized Constraint-Based Optimization for Multi-Agent Planning and Coordination](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1550662)
+- NFS grant 1345232 [iCREDITS: Interdisciplinary Center of Research Excellence in Design of Intelligent Technologies for Smartgrids](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1345232)
+
 ## Contacts
 - Ferdinando Fioretto: fioretto@umich.edu
 - William Yeoh: wyeoh@cs.nmsu.edu
